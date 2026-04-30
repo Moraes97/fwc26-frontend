@@ -179,7 +179,7 @@ export default function Dashboard() {
               {title:'Álbum Panini 2026',sub:'980 cromos · 68 especiais',icon:'📒',bg:'#e8f8ed',items:[['Total de cromos','980'],['Figurinhas especiais','68 brilhantes/douradas'],['Por seleção','~20 figurinhas'],['Por pacote','7 figurinhas'],['Recorde','Maior álbum da Copa']]},
               {title:'Favoritos ao título',sub:'Odds das apostas',icon:'⚽',bg:'#fff9e0',items:[['🇫🇷 França','+350'],['🇧🇷 Brasil','+400'],['🇦🇷 Argentina','+450'],['🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra','+500'],['🇩🇪 Alemanha','+600'],['🇪🇸 Espanha','+650']]},
             ].map((card,ci) => {
-              const [open, setOpen] = useState(false)
+              
               return (
                 <div key={ci} style={{background:'#141414',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',overflow:'hidden',marginBottom:'10px'}}>
                   <div onClick={() => setOpen(!open)} style={{padding:'14px 16px',display:'flex',alignItems:'center',gap:'10px',cursor:'pointer'}}>
