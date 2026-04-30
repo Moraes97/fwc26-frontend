@@ -1,26 +1,57 @@
-@import "tailwindcss";
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/barlow-condensed/900.css';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/700.css';
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --R: #E8175D;
+  --R2: #c0134e;
+  --P: #6B2FFA;
+  --B: #1A56DB;
+  --T: #00C9B1;
+  --G: #22C55E;
+  --Y: #F5C518;
+  --O: #FF6B00;
+  --dk: #0a0a0a;
+  --dk2: #141414;
+  --dk3: #1e1e1e;
+  --lt: #ffffff;
+  --mt: rgba(255,255,255,0.5);
+  --border: rgba(255,255,255,0.1);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Barlow', sans-serif;
+  background: var(--dk);
+  color: white;
+  overflow-x: hidden;
 }
+
+.fh { font-family: 'Barlow Condensed', sans-serif; }
+
+.rainbow {
+  height: 5px;
+  display: flex;
+  flex-shrink: 0;
+}
+.rainbow span { flex: 1; }
+
+input, select, textarea {
+  background: var(--dk3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus { border-color: var(--R); }
+input::placeholder { color: rgba(255,255,255,0.25); }
+select option { background: var(--dk2); }
+
+a { text-decoration: none; }
