@@ -83,8 +83,6 @@ export default function Trocas() {
         <div style={{background:'linear-gradient(135deg,#E8175D,#6B2FFA)',borderRadius:'16px',padding:'18px',marginBottom:'16px',position:'relative',overflow:'hidden'}}>
           <div style={{position:'absolute',right:'-10px',top:'-20px',fontFamily:'Barlow Condensed',fontSize:'100px',fontWeight:'900',color:'rgba(255,255,255,0.08)',lineHeight:'1'}}>⇄</div>
           <div style={{fontFamily:'Barlow Condensed',fontSize:'22px',fontWeig
-cd /workspaces/fwc26-frontend
-cat > app/trocas/page.js << 'EOF'
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
