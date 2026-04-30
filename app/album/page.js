@@ -4,6 +4,12 @@ import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
 
+const ESPECIAIS = [
+  {n:'FIFA World Cup 2026',c:'FWC',tipo:'fwc',total:8,icone:'🏆',cor:'#1A56DB',desc:'Emblema, Bola, Mascotes, Slogan, Países Sede'},
+  {n:'FIFA World Cup History',c:'FWC_H',tipo:'fwc_h',total:11,icone:'📜',cor:'#6B2FFA',desc:'FWC 9 a 19 — História das Copas'},
+  {n:'Coca-Cola',c:'CC',tipo:'cc',total:12,icone:'🥤',cor:'#E8175D',desc:'CC1 a CC12 — Jogadores especiais'},
+]
+
 const GRUPOS = [
   {n:'A',p:[{n:'México',c:'MEX',f:'mx'},{n:'África do Sul',c:'RSA',f:'za'},{n:'Coreia do Sul',c:'KOR',f:'kr'},{n:'Rep. Tcheca',c:'CZE',f:'cz'}]},
   {n:'B',p:[{n:'Canadá',c:'CAN',f:'ca'},{n:'Bósnia',c:'BIH',f:'ba'},{n:'Catar',c:'QAT',f:'qa'},{n:'Suíça',c:'SUI',f:'ch'}]},
