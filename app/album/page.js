@@ -33,33 +33,48 @@ const ESPECIAIS = [
 
 const API = process.env.NEXT_PUBLIC_API_URL
 
-function StickerCard({ code, label, cor, status, qty, onToggle }) {
+function StickerCard({ code, label, cor, status, qty, onToggle, onAdd, onRemove }) {
   const isHave = status === 'HAVE'
   const isRep = status === 'REPEATED'
+  const isMissing = status === 'MISSING'
   return (
-    <div onClick={() => onToggle(code)}
-      style={{
-        borderRadius: '10px', padding: '10px 4px',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', userSelect: 'none', transition: 'all .15s', position: 'relative',
-        background: isHave ? cor : isRep ? '#b8860b' : 'rgba(255,255,255,0.04)',
-        border: '2px solid ' + (isHave ? cor : isRep ? '#F5C518' : 'rgba(255,255,255,0.08)'),
-        transform: isHave || isRep ? 'scale(1.04)' : 'scale(1)',
-        boxShadow: isHave ? ('0 4px 12px ' + cor + '55') : isRep ? '0 4px 12px rgba(245,197,24,0.4)' : 'none',
-      }}>
-      <div style={{fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', lineHeight: '1',
-        color: isHave ? 'white' : isRep ? '#F5C518' : 'rgba(255,255,255,0.3)', marginBottom: '2px'}}>
-        {label}
-      </div>
-      <div style={{fontSize: '13px', lineHeight: '1', color: isHave ? 'white' : isRep ? '#F5C518' : 'transparent'}}>
-        {isHave ? '✓' : isRep ? (qty + 'x') : '·'}
-      </div>
-      {isRep && qty > 1 && (
-        <div style={{position: 'absolute', top: '-3px', right: '-3px', background: '#E8175D', color: 'white',
-          fontSize: '8px', fontWeight: '900', minWidth: '15px', height: '15px', borderRadius: '99px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px'}}>
-          {qty}
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div onClick={() => onToggle(code)}
+        style={{
+          borderRadius: '10px', padding: '10px 4px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', userSelect: 'none', transition: 'all .15s', position: 'relative',
+          background: isHave ? cor : isRep ? '#b8860b' : 'rgba(255,255,255,0.04)',
+          border: '2px solid ' + (isHave ? cor : isRep ? '#F5C518' : 'rgba(255,255,255,0.08)'),
+          transform: isHave || isRep ? 'scale(1.02)' : 'scale(1)',
+          boxShadow: isHave ? ('0 4px 12px ' + cor + '55') : isRep ? '0 4px 12px rgba(245,197,24,0.4)' : 'none',
+        }}>
+        <div style={{fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', lineHeight: '1',
+          color: isHave ? 'white' : isRep ? '#F5C518' : 'rgba(255,255,255,0.3)', marginBottom: '2px'}}>
+          {label}
         </div>
+        <div style={{fontSize: '12px', lineHeight: '1', color: isHave ? 'white' : isRep ? '#F5C518' : 'transparent'}}>
+          {isHave ? 'TENHO' : isRep ? (qty + 'x REP') : '-'}
+        </div>
+      </div>
+      {isRep && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <button onClick={e => { e.stopPropagation(); onRemove(code) }}
+            style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.4)', color: '#E8175D', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1' }}>
+            -
+          </button>
+          <span style={{ fontFamily: 'Barlow Condensed', fontSize: '13px', fontWeight: '900', color: '#F5C518', minWidth: '20px', textAlign: 'center' }}>{qty}</span>
+          <button onClick={e => { e.stopPropagation(); onAdd(code) }}
+            style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1' }}>
+            +
+          </button>
+        </div>
+      )}
+      {isMissing && (
+        <button onClick={e => { e.stopPropagation(); onToggle(code) }}
+          style={{ width: '100%', padding: '3px', borderRadius: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontSize: '10px', cursor: 'pointer', fontFamily: 'Barlow Condensed', fontWeight: '700' }}>
+          MARCAR
+        </button>
       )}
     </div>
   )
@@ -140,6 +155,40 @@ export default function Album() {
     const msg = next === 'HAVE' ? 'Tenho!' : next === 'REPEATED' ? (qty + 'x Repetidas!') : 'Removida'
     setToast(msg)
     setTimeout(() => setToast(null), 1200)
+  }
+
+  function addRep(code) {
+    const cur = getStatus(code)
+    const curQty = getQty(code)
+    if (cur === 'MISSING') { togStk(code); return }
+    const qty = Math.min(curQty + 1, 9)
+    const updated = Object.assign({}, stickers)
+    updated[code] = 'REPEATED'
+    updated[code + '_qty'] = qty
+    setStickers(updated)
+    localStorage.setItem('fwc26_album', JSON.stringify(updated))
+    setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status: 'REPEATED', quantity: qty }])
+    setToast(qty + 'x repetidas!')
+    setTimeout(() => setToast(null), 1000)
+  }
+
+  function removeRep(code) {
+    const curQty = getQty(code)
+    const updated = Object.assign({}, stickers)
+    if (curQty <= 2) {
+      updated[code] = 'HAVE'
+      delete updated[code + '_qty']
+      setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status: 'HAVE', quantity: 1 }])
+      setToast('Voltou para TENHO')
+    } else {
+      const qty = curQty - 1
+      updated[code + '_qty'] = qty
+      setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status: 'REPEATED', quantity: qty }])
+      setToast(qty + 'x repetidas')
+    }
+    setStickers(updated)
+    localStorage.setItem('fwc26_album', JSON.stringify(updated))
+    setTimeout(() => setToast(null), 1000)
   }
 
   function pHave(pais) {
@@ -350,7 +399,7 @@ export default function Album() {
               {modal.especial ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
                   {modal.especial.codes.map((code, ci) => (
-                    <StickerCard key={code} code={code} label={modal.especial.nums[ci]} cor={modal.especial.cor} status={getStatus(code)} qty={getQty(code)} onToggle={togStk} />
+                    <StickerCard key={code} code={code} label={modal.especial.nums[ci]} cor={modal.especial.cor} status={getStatus(code)} qty={getQty(code)} onToggle={togStk} onAdd={addRep} onRemove={removeRep} />
                   ))}
                 </div>
               ) : (
@@ -358,7 +407,7 @@ export default function Album() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '8px', marginBottom: '16px' }}>
                     {Array.from({ length: 20 }, (_, i) => {
                       const code = modal.pais.c + '_' + String(i + 1).padStart(2, '0')
-                      return <StickerCard key={code} code={code} label={String(i + 1)} cor={modal.grupo.cor} status={getStatus(code)} qty={getQty(code)} onToggle={togStk} />
+                      return <StickerCard key={code} code={code} label={String(i + 1)} cor={modal.grupo.cor} status={getStatus(code)} qty={getQty(code)} onToggle={togStk} onAdd={addRep} onRemove={removeRep} />
                     })}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
