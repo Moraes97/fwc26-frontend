@@ -19,6 +19,19 @@ const GRUPOS = [
   {n:'L',cor:'#1A56DB',p:[{n:'Inglaterra',c:'ENG',f:'gb-eng'},{n:'Croácia',c:'CRO',f:'hr'},{n:'Gana',c:'GHA',f:'gh'},{n:'Panamá',c:'PAN',f:'pa'}]},
 ]
 
+
+const ESPECIAIS = [
+  {n:'FWC 1-8',cor:'#1A56DB',desc:'Emblema · Bola · Mascotes · Slogan',icone:'🏆',
+   codes:['FWC_01','FWC_02','FWC_03','FWC_04','FWC_05','FWC_06','FWC_07','FWC_08'],
+   nums:['FWC1','FWC2','FWC3','FWC4','FWC5','FWC6','FWC7','FWC8']},
+  {n:'FWC History 9-19',cor:'#6B2FFA',desc:'História das Copas do Mundo',icone:'📜',
+   codes:['FWC_09','FWC_10','FWC_11','FWC_12','FWC_13','FWC_14','FWC_15','FWC_16','FWC_17','FWC_18','FWC_19'],
+   nums:['FWC9','FWC10','FWC11','FWC12','FWC13','FWC14','FWC15','FWC16','FWC17','FWC18','FWC19']},
+  {n:'Coca-Cola CC1-12',cor:'#E8175D',desc:'Jogadores especiais Coca-Cola',icone:'🥤',
+   codes:['CC_01','CC_02','CC_03','CC_04','CC_05','CC_06','CC_07','CC_08','CC_09','CC_10','CC_11','CC_12'],
+   nums:['CC1','CC2','CC3','CC4','CC5','CC6','CC7','CC8','CC9','CC10','CC11','CC12']},
+]
+
 const API = process.env.NEXT_PUBLIC_API_URL
 
 function StickerGrid({ pais, grupo, stickers, onToggle }) {
@@ -324,11 +337,15 @@ export default function Album() {
           onClick={e => { if(e.target === e.currentTarget) setModal(null) }}>
           <div style={{width:'100%',maxWidth:'600px',background:'#0d0d0d',borderRadius:'20px 20px 0 0',border:'2px solid rgba(255,255,255,0.1)',borderBottom:'none',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
             <div style={{padding:'16px 20px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',gap:'12px',flexShrink:0}}>
-              <img src={'https://flagcdn.com/w80/' + modal.pais.f + '.png'}
-                style={{width:'54px',height:'36px',borderRadius:'8px',objectFit:'cover',border:'2px solid ' + modal.grupo.cor,flexShrink:0}}/>
+              {modal.especial ? (
+                <div style={{width:'54px',height:'36px',borderRadius:'8px',background:modal.especial.cor,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'26px',flexShrink:0}}>{modal.especial.icone}</div>
+              ) : (
+                <img src={'https://flagcdn.com/w80/' + modal.pais.f + '.png'}
+                  style={{width:'54px',height:'36px',borderRadius:'8px',objectFit:'cover',border:'2px solid ' + modal.grupo.cor,flexShrink:0}}/>
+              )}
               <div style={{flex:1}}>
-                <div style={{fontFamily:'Barlow Condensed',fontSize:'22px',fontWeight:'900'}}>{modal.pais.n}</div>
-                <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)'}}>Grupo {modal.grupo.n} · {pHave(modal.pais)}/20 figurinhas</div>
+                <div style={{fontFamily:'Barlow Condensed',fontSize:'22px',fontWeight:'900'}}>{modal.especial ? modal.especial.n : modal.pais.n}</div>
+                <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)'}}>{modal.especial ? modal.especial.desc : ('Grupo ' + modal.grupo.n + ' · ' + pHave(modal.pais) + '/20 figurinhas')}</div>
               </div>
               <button onClick={() => setModal(null)}
                 style={{width:'32px',height:'32px',borderRadius:'50%',background:'rgba(255,255,255,0.08)',border:'none',color:'white',fontSize:'16px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -339,8 +356,32 @@ export default function Album() {
               1× = Tenho ✓ · 2× = Repetida · Mais toques = +Repetidas · Último toque = Remove
             </div>
             <div style={{overflowY:'auto',flex:1}}>
-              <StickerGrid pais={modal.pais} grupo={modal.grupo} stickers={stickers} onToggle={togStk}/>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',padding:'0 16px 20px'}}>
+              {modal.pais && <StickerGrid pais={modal.pais} grupo={modal.grupo} stickers={stickers} onToggle={togStk}/>}
+              {modal.especial && (
+                <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',padding:'8px 16px 20px'}}>
+                  {modal.especial.codes.map((code,ci) => {
+                    const st = stickers[code] || 'MISSING'
+                    const isHave = st === 'HAVE'
+                    const isRep = st === 'REPEATED'
+                    const qty = stickers[code+'_qty'] || 1
+                    return (
+                      <div key={code} onClick={() => togStk(code)}
+                        style={{borderRadius:'10px',padding:'12px 6px',display:'flex',flexDirection:'column',alignItems:'center',cursor:'pointer',userSelect:'none',transition:'all .15s',position:'relative',
+                          background: isHave ? modal.especial.cor : isRep ? '#F5C518' : 'rgba(255,255,255,0.05)',
+                          border: '2px solid ' + (isHave ? modal.especial.cor : isRep ? '#F5C518' : 'rgba(255,255,255,0.08)')}}>
+                        <div style={{fontFamily:'Barlow Condensed',fontSize:'12px',fontWeight:'900',color: isHave ? 'white' : isRep ? '#0a0a0a' : 'rgba(255,255,255,0.4)',marginBottom:'4px'}}>
+                          {modal.especial.nums[ci]}
+                        </div>
+                        <div style={{fontSize:'14px'}}>{isHave ? '✓' : isRep ? (qty+'×') : '□'}</div>
+                        {isRep && qty > 1 && (
+                          <div style={{position:'absolute',top:'-2px',right:'-2px',background:'#E8175D',color:'white',fontSize:'8px',fontWeight:'900',minWidth:'16px',height:'16px',borderRadius:'99px',display:'flex',alignItems:'center',justifyContent:'center',padding:'0 3px'}}>{qty}x</div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {!modal.especial && <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',padding:'0 16px 20px'}}>
                 <button onClick={() => {
                   const codes = Array.from({length:20}, (_,i) => modal.pais.c + '_' + String(i+1).padStart(2,'0'))
                   const updated = {...stickers}
