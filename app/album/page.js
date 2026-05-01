@@ -224,7 +224,7 @@ export default function Album() {
             <span style={{color:'#F5C518',fontWeight:'700',fontFamily:'Barlow Condensed',fontSize:'14px'}}>{pct}% completo</span>
           </div>
           <div style={{height:'10px',background:'rgba(255,255,255,0.06)',borderRadius:'99px',overflow:'hidden',marginBottom:'16px',maxWidth:'360px',margin:'0 auto 16px',border:'1px solid rgba(255,255,255,0.05)'}}>
-            <div style={{height:'100%',width:pct+'%',background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
+            <div style={{height:'100%',width:`${pct}%`,background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',maxWidth:'480px',margin:'0 auto'}}>
             {[
@@ -261,13 +261,13 @@ export default function Album() {
               const eHave = allCodes.filter(c => getStatus(c) !== 'MISSING').length
               return (
                 <div key={ei} onClick={() => setModal({ pais: e.p[0], grupo: { n: e.label, cor: e.cor, bg: e.bg }, isEspecial: true })}
-                  style={{background: e.bg, border: `1.5px solid ${e.cor}'33'`, borderRadius:'14px', padding:'14px', cursor:'pointer', display:'flex', alignItems:'center', gap:'12px', transition:'all .15s'}}>
-                  <div style={{width:'44px',height:'44px',borderRadius:'12px',background:`${e.cor}'22'`,border:`2px solid ${e.cor}'44'`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>{e.icone}</div>
+                  style={{background: e.bg, border: `1.5px solid ${e.cor}33`, borderRadius:'14px', padding:'14px', cursor:'pointer', display:'flex', alignItems:'center', gap:'12px', transition:'all .15s'}}>
+                  <div style={{width:'44px',height:'44px',borderRadius:'12px',background:`${e.cor}22`,border:`2px solid ${e.cor}44`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>{e.icone}</div>
                   <div style={{flex:1}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'15px',fontWeight:'700',color:'white'}}>{e.label}</div>
                     <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)',marginBottom:'6px'}}>{e.desc}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                      <div style={{height:'100%',width:Math.round((eHave/allCodes.length)*100)+'%',background:e.cor,borderRadius:'99px'}}/>
+                      <div style={{height:'100%',width:`${Math.round((eHave/allCodes.length)*100)}%`,background:e.cor,borderRadius:'99px'}}/>
                     </div>
                   </div>
                   <div style={{textAlign:'right',flexShrink:0}}>
@@ -295,16 +295,16 @@ export default function Album() {
             const grpPct = Math.round((grpHave/grpTotal)*100)
 
             return (
-              <div key={gi} style={{background:g.bg, border:`1.5px solid ${g.cor}'33'`, borderRadius:'16px', overflow:'hidden', transition:'all .15s'}}>
+              <div key={gi} style={{background:g.bg, border:`1.5px solid ${g.cor}33`, borderRadius:'16px', overflow:'hidden', transition:'all .15s'}}>
                 {/* GRUPO HEADER */}
-                <div style={{padding:'14px 16px',borderBottom:`1px solid ${g.cor}'22'`,display:'flex',alignItems:'center',gap:'10px'}}>
+                <div style={{padding:'14px 16px',borderBottom:`1px solid ${g.cor}22`,display:'flex',alignItems:'center',gap:'10px'}}>
                   <div style={{width:'40px',height:'40px',borderRadius:'10px',background:`linear-gradient(135deg,${g.cor},${g.cor}88)`,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:'white',flexShrink:0,boxShadow:`0 4px 12px ${g.cor}44'}}>
                     {g.n}
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'16px',fontWeight:'900',letterSpacing:'.5px'}}>GRUPO {g.n}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden',marginTop:'5px'}}>
-                      <div style={{height:'100%',width:grpPct+'%',background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
+                      <div style={{height:'100%',width:`${grpPct}%`,background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
                     </div>
                   </div>
                   <div style={{fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:g.cor,flexShrink:0}}>
@@ -318,14 +318,14 @@ export default function Album() {
                     const ph = pHave(p)
                     return (
                       <div key={p.c} onClick={() => setModal({pais:p, grupo:g})}
-                        style={{background:'rgba(255,255,255,0.05)',border:`1px solid ${g.cor}'22'`,borderRadius:'10px',padding:'10px',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'8px'}}>
+                        style={{background:'rgba(255,255,255,0.05)',border:`1px solid ${g.cor}22`,borderRadius:'10px',padding:'10px',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'8px'}}>
                         <img src={`https://flagcdn.com/w40/${p.f}.png`}
-                          style={{width:'36px',height:'24px',borderRadius:'5px',objectFit:'cover',border:`1.5px solid ${g.cor}'44'`,boxShadow:'0 2px 6px rgba(0,0,0,0.4)',flexShrink:0}}/>
+                          style={{width:'36px',height:'24px',borderRadius:'5px',objectFit:'cover',border:`1.5px solid ${g.cor}44`,boxShadow:'0 2px 6px rgba(0,0,0,0.4)',flexShrink:0}}/>
                         <div style={{flex:1,overflow:'hidden',minWidth:0}}>
                           <div style={{fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.n}</div>
                           <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'3px'}}>
                             <div style={{flex:1,height:'3px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                              <div style={{height:'100%',width:Math.round((ph/20)*100)+'%',background:g.cor,borderRadius:'99px'}}/>
+                              <div style={{height:'100%',width:`${Math.round((ph/20)*100)}%`,background:g.cor,borderRadius:'99px'}}/>
                             </div>
                             <span style={{fontSize:'9px',color:'rgba(255,255,255,0.5)',fontWeight:'700',flexShrink:0}}>{ph}/20</span>
                           </div>
@@ -344,15 +344,15 @@ export default function Album() {
       {modal && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center',backdropFilter:'blur(8px)'}}
           onClick={e => { if(e.target===e.currentTarget) setModal(null) }}>
-          <div style={{width:'100%',maxWidth:'600px',background:`${modal.grupo.bg || '#0a0a0a'}`,borderRadius:'20px 20px 0 0',border:`2px solid ${modal.grupo.cor}'55'`,borderBottom:'none',maxHeight:'85vh',display:'flex',flexDirection:'column',boxShadow:`0 -8px 40px ${modal.grupo.cor}'22'`}}>
+          <div style={{width:'100%',maxWidth:'600px',background:`${modal.grupo.bg || '#0a0a0a'}`,borderRadius:'20px 20px 0 0',border:`2px solid ${modal.grupo.cor}55`,borderBottom:'none',maxHeight:'85vh',display:'flex',flexDirection:'column',boxShadow:`0 -8px 40px ${modal.grupo.cor}22`}}>
 
             {/* MODAL HEADER */}
-            <div style={{padding:'16px 20px',borderBottom:`1px solid ${modal.grupo.cor}'22'`,display:'flex',alignItems:'center',gap:'12px',flexShrink:0}}>
+            <div style={{padding:'16px 20px',borderBottom:`1px solid ${modal.grupo.cor}22`,display:'flex',alignItems:'center',gap:'12px',flexShrink:0}}>
               {modal.pais.f !== 'un' ? (
                 <img src={`https://flagcdn.com/w80/${modal.pais.f}.png`}
-                  style={{width:'54px',height:'36px',borderRadius:'8px',objectFit:'cover',border:`2px solid ${modal.grupo.cor}`,boxShadow:`0 4px 16px ${modal.grupo.cor}'44'`,flexShrink:0}}/>
+                  style={{width:'54px',height:'36px',borderRadius:'8px',objectFit:'cover',border:`2px solid ${modal.grupo.cor}`,boxShadow:`0 4px 16px ${modal.grupo.cor}44`,flexShrink:0}}/>
               ) : (
-                <div style={{width:'54px',height:'36px',borderRadius:'8px',background:`${modal.grupo.cor}'22'`,border:`2px solid ${modal.grupo.cor}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',flexShrink:0}}>
+                <div style={{width:'54px',height:'36px',borderRadius:'8px',background:`${modal.grupo.cor}22`,border:`2px solid ${modal.grupo.cor}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',flexShrink:0}}>
                   {modal.grupo.n === 'Coca-Cola CC1–12' ? '🥤' : modal.grupo.n.includes('History') ? '📜' : '🏆'}
                 </div>
               )}
@@ -396,7 +396,7 @@ export default function Album() {
                           style={{borderRadius:'12px',padding:'12px 6px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer',userSelect:'none',transition:'all .15s',position:'relative',overflow:'hidden',
                             background: isHave ? `linear-gradient(135deg,${modal.grupo.cor},${modal.grupo.cor}88)` : isRep ? 'linear-gradient(135deg,#b8860b,#F5C518)' : isSpec ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.05)',
                             border: `2px solid ${isHave ? modal.grupo.cor : isRep ? '#F5C518' : isSpec ? 'rgba(201,168,76,0.25)' : 'rgba(255,255,255,0.07)'}`,
-                            boxShadow: isHave ? `0 4px 14px ${modal.grupo.cor}'44'` : isRep ? '0 4px 14px rgba(245,197,24,0.3)' : 'none',
+                            boxShadow: isHave ? `0 4px 14px ${modal.grupo.cor}44` : isRep ? '0 4px 14px rgba(245,197,24,0.3)' : 'none',
                             transform: isHave || isRep ? 'scale(1.03)' : 'scale(1)'}}>
                           {isSpec && !isHave && !isRep && <div style={{position:'absolute',top:'3px',right:'4px',fontSize:'9px'}}>⭐</div>}
                           <div style={{fontFamily:'Barlow Condensed',fontSize:'22px',fontWeight:'900',lineHeight:'1',color: isHave ? 'white' : isRep ? '#0a0a0a' : 'rgba(255,255,255,0.25)',marginBottom:'3px'}}>
@@ -430,7 +430,7 @@ export default function Album() {
                     setToast('✓ Todas marcadas!')
                     setTimeout(()=>setToast(null),2000)
                   }}
-                    style={{padding:'10px',background:`${modal.grupo.cor}'22'`,border:`1px solid ${modal.grupo.cor}'44'`,borderRadius:'10px',color:modal.grupo.cor,fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',cursor:'pointer',letterSpacing:'.5px'}}>
+                    style={{padding:'10px',background:`${modal.grupo.cor}22`,border:`1px solid ${modal.grupo.cor}44`,borderRadius:'10px',color:modal.grupo.cor,fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',cursor:'pointer',letterSpacing:'.5px'}}>
                     ✓ MARCAR TODAS
                   </button>
                   <button onClick={() => {
