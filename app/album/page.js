@@ -319,7 +319,7 @@ export default function Album() {
                     return (
                       <div key={p.c} onClick={() => setModal({pais:p, grupo:g})}
                         style={{background:'rgba(255,255,255,0.05)',border:('1px solid ' + g.cor + '22'),borderRadius:'10px',padding:'10px',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'8px'}}>
-                        <img src={`https://flagcdn.com/w40/${p.f}.png`}
+                        <img src={'https://flagcdn.com/w40/'+p.f+'.png'}
                           style={{width:'36px',height:'24px',borderRadius:'5px',objectFit:'cover',border:('1.5px solid ' + g.cor + '44'),boxShadow:'0 2px 6px rgba(0,0,0,0.4)',flexShrink:0}}/>
                         <div style={{flex:1,overflow:'hidden',minWidth:0}}>
                           <div style={{fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.n}</div>
@@ -349,7 +349,7 @@ export default function Album() {
             {/* MODAL HEADER */}
             <div style={{padding:'16px 20px',borderBottom:('1px solid ' + modal.grupo.cor + '22'),display:'flex',alignItems:'center',gap:'12px',flexShrink:0}}>
               {modal.pais.f !== 'un' ? (
-                <img src={`https://flagcdn.com/w80/${modal.pais.f}.png`}
+                <img src={'https://flagcdn.com/w80/'+modal.pais.f+'.png'}
                   style={{width:'54px',height:'36px',borderRadius:'8px',objectFit:'cover',border:('2px solid ' + modal.grupo.cor),boxShadow:('0 4px 16px ' + modal.grupo.cor + '44'),flexShrink:0}}/>
               ) : (
                 <div style={{width:'54px',height:'36px',borderRadius:'8px',background:(modal.grupo.cor + '22'),border:('2px solid ' + modal.grupo.cor),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',flexShrink:0}}>
