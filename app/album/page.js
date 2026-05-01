@@ -55,7 +55,7 @@ export default function Album() {
 
   async function loadAlbum(token) {
     try {
-      const res = await fetch(`${API}/api/album`, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(API+'/api/album', { headers: { Authorization: 'Bearer '+token } })
       if (!res.ok) throw new Error()
       const data = await res.json()
       const map = {}
@@ -80,9 +80,9 @@ export default function Album() {
     if (!token || pendingUpdates.length === 0) return
     setSaving(true)
     try {
-      await fetch(`${API}/api/album/stickers`, {
+      await fetch(API+'/api/album/stickers', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer '+token },
         body: JSON.stringify({ updates: pendingUpdates })
       })
       setPendingUpdates([])
@@ -106,7 +106,7 @@ export default function Album() {
     setStickers(updated)
     localStorage.setItem('fwc26_album', JSON.stringify(updated))
     setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status: next, quantity: qty }])
-    const msgs = { HAVE: '✓ Tenho!', REPEATED: `${qty}× Repetidas!`, MISSING: 'Removida' }
+    const msgs = { HAVE: '✓ Tenho!', REPEATED: (qty+'× Repetidas!'), MISSING: 'Removida' }
     setToast(msgs[next])
     setTimeout(() => setToast(null), 1200)
   }
@@ -119,10 +119,10 @@ export default function Album() {
     GRUPOS.forEach(g => {
       g.p.forEach(p => {
         for (let i = 1; i <= 20; i++) {
-          const code = `${p.c}_${String(i).padStart(2,'0')}`
-          const label = `${p.c} ${i}`
+          const code = p.c+'_'+String(i).padStart(2,'0')
+          const label = p.c+' '+i
           if (label.includes(q) || p.n.toUpperCase().includes(q) || String(i) === q || p.c.includes(q)) {
-            results.push({ code, label: `${p.n} #${i}`, grupo: g, pais: p, num: i })
+            results.push({ code, label: p.n+' #'+i, grupo: g, pais: p, num: i })
           }
         }
       })
@@ -130,14 +130,14 @@ export default function Album() {
     setSearchResults(results.slice(0, 20))
   }, [search])
 
-  const allCodes = GRUPOS.flatMap(g => g.p.flatMap(p => Array.from({length:20}, (_,i) => `${p.c}_${String(i+1).padStart(2,'0')}`)))
+  const allCodes = GRUPOS.flatMap(g => g.p.flatMap(p => Array.from({length:20}, (_,i) => p.c+'_'+String(i+1).padStart(2,'0'))))
   const total = allCodes.length
   const have = allCodes.filter(c => getStatus(c) !== 'MISSING').length
   const repeated = allCodes.filter(c => getStatus(c) === 'REPEATED').length
   const pct = Math.round((have/total)*100)
 
   function pHave(pais) {
-    return Array.from({length:20}).filter((_,i) => getStatus(`${pais.c}_${String(i+1).padStart(2,'0')}`) !== 'MISSING').length
+    return Array.from({length:20}).filter((_,i) => getStatus(pais.c+'_'+String(i+1).padStart(2,'0')) !== 'MISSING').length
   }
 
   if (loading) return (
@@ -197,7 +197,7 @@ export default function Album() {
                       </div>
                       <div style={{fontFamily:'Barlow Condensed',fontSize:'12px',fontWeight:'700',
                         color: st==='HAVE' ? r.grupo.cor : st==='REPEATED' ? '#F5C518' : 'rgba(255,255,255,0.3)'}}>
-                        {st==='MISSING' ? 'FALTA' : st==='HAVE' ? 'TENHO' : `${qty}× REP`}
+                        {st==='MISSING' ? 'FALTA' : st==='HAVE' ? 'TENHO' : (qty+'× REP')}
                       </div>
                     </div>
                   )
@@ -206,7 +206,7 @@ export default function Album() {
             )}
           </div>
           <div style={{fontSize:'11px',color:saving?'#F5C518':'rgba(255,255,255,0.3)',fontWeight:'700',flexShrink:0}}>
-            {saving ? '💾 Salvando...' : `✓ ${pct}%`}
+            {saving ? '💾 Salvando...' : ('✓ '+pct+'%')}
           </div>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function Album() {
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(340px,1fr))',gap:'12px'}}>
           {GRUPOS.map((g, gi) => {
-            const grpCodes = g.p.flatMap(p => Array.from({length:20}, (_,i) => `${p.c}_${String(i+1).padStart(2,'0')}`))
+            const grpCodes = g.p.flatMap(p => Array.from({length:20}, (_,i) => p.c+'_'+String(i+1).padStart(2,'0')))
             const grpHave = grpCodes.filter(c => getStatus(c) !== 'MISSING').length
             const grpTotal = grpCodes.length
             const grpPct = Math.round((grpHave/grpTotal)*100)
@@ -359,7 +359,7 @@ export default function Album() {
               <div style={{flex:1}}>
                 <div style={{fontFamily:'Barlow Condensed',fontSize:'22px',fontWeight:'900',letterSpacing:'.5px'}}>{modal.pais.n}</div>
                 <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)'}}>
-                  {modal.isEspecial ? modal.grupo.n : `Grupo ${modal.grupo.n}`} · {
+                  {modal.isEspecial ? modal.grupo.n : ('Grupo ' + modal.grupo.n)} · {
                     modal.pais.codes
                       ? modal.pais.codes.filter(c => getStatus(c) !== 'MISSING').length + '/' + modal.pais.codes.length
                       : pHave(modal.pais) + '/20'
@@ -381,7 +381,7 @@ export default function Album() {
             {/* FIGURINHAS */}
             <div style={{overflowY:'auto',padding:'8px 20px 16px',flex:1}}>
               {(() => {
-                const codes = modal.pais.codes || Array.from({length:20}, (_,i) => `${modal.pais.c}_${String(i+1).padStart(2,'0')}`)
+                const codes = modal.pais.codes || Array.from({length:20}, (_,i) => modal.pais.c+'_'+String(i+1).padStart(2,'0'))
                 const nums = modal.pais.nums || Array.from({length:20}, (_,i) => String(i+1))
                 return (
                   <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'8px'}}>
@@ -403,7 +403,7 @@ export default function Album() {
                             {nums[ci]}
                           </div>
                           <div style={{fontSize:'16px',lineHeight:'1'}}>
-                            {isHave ? '✓' : isRep ? `${qty}×` : ''}
+                            {isHave ? '✓' : isRep ? (qty+'×') : ''}
                           </div>
                           {isRep && qty > 1 && (
                             <div style={{position:'absolute',top:'-2px',right:'-2px',background:'#E8175D',color:'white',fontSize:'8px',fontWeight:'900',minWidth:'16px',height:'16px',borderRadius:'99px',display:'flex',alignItems:'center',justifyContent:'center',padding:'0 3px'}}>
@@ -421,7 +421,7 @@ export default function Album() {
               {!modal.pais.codes && (
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginTop:'14px'}}>
                   <button onClick={() => {
-                    const codes = Array.from({length:20}, (_,i) => `${modal.pais.c}_${String(i+1).padStart(2,'0')}`)
+                    const codes = Array.from({length:20}, (_,i) => modal.pais.c+'_'+String(i+1).padStart(2,'0'))
                     const updates = {}
                     codes.forEach(code => { updates[code] = { status: 'HAVE', qty: 1 } })
                     setStickers(prev => ({...prev,...updates}))
@@ -434,7 +434,7 @@ export default function Album() {
                     ✓ MARCAR TODAS
                   </button>
                   <button onClick={() => {
-                    const codes = Array.from({length:20}, (_,i) => `${modal.pais.c}_${String(i+1).padStart(2,'0')}`)
+                    const codes = Array.from({length:20}, (_,i) => modal.pais.c+'_'+String(i+1).padStart(2,'0'))
                     const updated = {...stickers}
                     codes.forEach(code => { delete updated[code] })
                     setStickers(updated)
