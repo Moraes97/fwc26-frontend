@@ -395,7 +395,7 @@ export default function Album() {
                         <div key={code} onClick={() => togStk(code)}
                           style={{borderRadius:'12px',padding:'12px 6px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer',userSelect:'none',transition:'all .15s',position:'relative',overflow:'hidden',
                             background: isHave ? ('linear-gradient(135deg,' + modal.grupo.cor + ',' + modal.grupo.cor + '88)') : isRep ? 'linear-gradient(135deg,#b8860b,#F5C518)' : isSpec ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.05)',
-                            border: `2px solid ${isHave ? modal.grupo.cor : isRep ? '#F5C518' : isSpec ? 'rgba(201,168,76,0.25)' : 'rgba(255,255,255,0.07)'}`,
+                            border: '2px solid '+(isHave ? modal.grupo.cor : isRep ? '#F5C518' : isSpec ? 'rgba(201,168,76,0.25)' : 'rgba(255,255,255,0.07)'),
                             boxShadow: isHave ? ('0 4px 14px ' + modal.grupo.cor + '44') : isRep ? '0 4px 14px rgba(245,197,24,0.3)' : 'none',
                             transform: isHave || isRep ? 'scale(1.03)' : 'scale(1)'}}>
                           {isSpec && !isHave && !isRep && <div style={{position:'absolute',top:'3px',right:'4px',fontSize:'9px'}}>⭐</div>}
