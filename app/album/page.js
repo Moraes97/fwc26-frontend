@@ -224,7 +224,7 @@ export default function Album() {
             <span style={{color:'#F5C518',fontWeight:'700',fontFamily:'Barlow Condensed',fontSize:'14px'}}>{pct}% completo</span>
           </div>
           <div style={{height:'10px',background:'rgba(255,255,255,0.06)',borderRadius:'99px',overflow:'hidden',marginBottom:'16px',maxWidth:'360px',margin:'0 auto 16px',border:'1px solid rgba(255,255,255,0.05)'}}>
-            <div style={{height:'100%',width:`${pct}%`,background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
+            <div style={{height:'100%',width:(pct+'%'),background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',maxWidth:'480px',margin:'0 auto'}}>
             {[
@@ -262,12 +262,12 @@ export default function Album() {
               return (
                 <div key={ei} onClick={() => setModal({ pais: e.p[0], grupo: { n: e.label, cor: e.cor, bg: e.bg }, isEspecial: true })}
                   style={{background: e.bg, border: `1.5px solid ${e.cor}33`, borderRadius:'14px', padding:'14px', cursor:'pointer', display:'flex', alignItems:'center', gap:'12px', transition:'all .15s'}}>
-                  <div style={{width:'44px',height:'44px',borderRadius:'12px',background:(e.cor + '22'),border:`2px solid ${e.cor}44`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>{e.icone}</div>
+                  <div style={{width:'44px',height:'44px',borderRadius:'12px',background:(e.cor + '22'),border:('2px solid '+e.cor+'44'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>{e.icone}</div>
                   <div style={{flex:1}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'15px',fontWeight:'700',color:'white'}}>{e.label}</div>
                     <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)',marginBottom:'6px'}}>{e.desc}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                      <div style={{height:'100%',width:`${Math.round((eHave/allCodes.length)*100)}%`,background:e.cor,borderRadius:'99px'}}/>
+                      <div style={{height:'100%',width:(Math.round((eHave/allCodes.length)*100)+'%'),background:e.cor,borderRadius:'99px'}}/>
                     </div>
                   </div>
                   <div style={{textAlign:'right',flexShrink:0}}>
@@ -295,7 +295,7 @@ export default function Album() {
             const grpPct = Math.round((grpHave/grpTotal)*100)
 
             return (
-              <div key={gi} style={{background:g.bg, border:`1.5px solid ${g.cor}33`, borderRadius:'16px', overflow:'hidden', transition:'all .15s'}}>
+              <div key={gi} style={{background:g.bg, border:('1.5px solid '+g.cor+'33'), borderRadius:'16px', overflow:'hidden', transition:'all .15s'}}>
                 {/* GRUPO HEADER */}
                 <div style={{padding:'14px 16px',borderBottom:('1px solid ' + g.cor + '22'),display:'flex',alignItems:'center',gap:'10px'}}>
                   <div style={{width:'40px',height:'40px',borderRadius:'10px',background:('linear-gradient(135deg,' + g.cor + ',' + g.cor + '88)'),display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:'white',flexShrink:0,boxShadow:`0 4px 12px ${g.cor}44'}}>
@@ -304,7 +304,7 @@ export default function Album() {
                   <div style={{flex:1}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'16px',fontWeight:'900',letterSpacing:'.5px'}}>GRUPO {g.n}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden',marginTop:'5px'}}>
-                      <div style={{height:'100%',width:`${grpPct}%`,background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
+                      <div style={{height:'100%',width:(grpPct+'%'),background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
                     </div>
                   </div>
                   <div style={{fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:g.cor,flexShrink:0}}>
@@ -325,7 +325,7 @@ export default function Album() {
                           <div style={{fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.n}</div>
                           <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'3px'}}>
                             <div style={{flex:1,height:'3px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                              <div style={{height:'100%',width:`${Math.round((ph/20)*100)}%`,background:g.cor,borderRadius:'99px'}}/>
+                              <div style={{height:'100%',width:(Math.round((ph/20)*100)+'%'),background:g.cor,borderRadius:'99px'}}/>
                             </div>
                             <span style={{fontSize:'9px',color:'rgba(255,255,255,0.5)',fontWeight:'700',flexShrink:0}}>{ph}/20</span>
                           </div>
@@ -344,7 +344,7 @@ export default function Album() {
       {modal && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center',backdropFilter:'blur(8px)'}}
           onClick={e => { if(e.target===e.currentTarget) setModal(null) }}>
-          <div style={{width:'100%',maxWidth:'600px',background:`${modal.grupo.bg || '#0a0a0a'}`,borderRadius:'20px 20px 0 0',border:`2px solid ${modal.grupo.cor}55`,borderBottom:'none',maxHeight:'85vh',display:'flex',flexDirection:'column',boxShadow:('0 -8px 40px ' + modal.grupo.cor + '22')}}>
+          <div style={{width:'100%',maxWidth:'600px',background:(modal.grupo.bg||'#0a0a0a'),borderRadius:'20px 20px 0 0',border:('2px solid '+modal.grupo.cor+'55'),borderBottom:'none',maxHeight:'85vh',display:'flex',flexDirection:'column',boxShadow:('0 -8px 40px ' + modal.grupo.cor + '22')}}>
 
             {/* MODAL HEADER */}
             <div style={{padding:'16px 20px',borderBottom:('1px solid ' + modal.grupo.cor + '22'),display:'flex',alignItems:'center',gap:'12px',flexShrink:0}}>
