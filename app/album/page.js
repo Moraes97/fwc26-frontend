@@ -224,7 +224,7 @@ export default function Album() {
             <span style={{color:'#F5C518',fontWeight:'700',fontFamily:'Barlow Condensed',fontSize:'14px'}}>{pct}% completo</span>
           </div>
           <div style={{height:'10px',background:'rgba(255,255,255,0.06)',borderRadius:'99px',overflow:'hidden',marginBottom:'16px',maxWidth:'360px',margin:'0 auto 16px',border:'1px solid rgba(255,255,255,0.05)'}}>
-            <div style={{height:'100%',width:`${pct}%`,background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
+            <div style={{height:'100%',width:pct+'%',background:'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)',borderRadius:'99px',transition:'width .5s'}}/>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',maxWidth:'480px',margin:'0 auto'}}>
             {[
@@ -267,7 +267,7 @@ export default function Album() {
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'15px',fontWeight:'700',color:'white'}}>{e.label}</div>
                     <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)',marginBottom:'6px'}}>{e.desc}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                      <div style={{height:'100%',width:`${Math.round((eHave/allCodes.length)*100)}%`,background:e.cor,borderRadius:'99px'}}/>
+                      <div style={{height:'100%',width:Math.round((eHave/allCodes.length)*100)+'%',background:e.cor,borderRadius:'99px'}}/>
                     </div>
                   </div>
                   <div style={{textAlign:'right',flexShrink:0}}>
@@ -304,7 +304,7 @@ export default function Album() {
                   <div style={{flex:1}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'16px',fontWeight:'900',letterSpacing:'.5px'}}>GRUPO {g.n}</div>
                     <div style={{height:'4px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden',marginTop:'5px'}}>
-                      <div style={{height:'100%',width:`${grpPct}%`,background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
+                      <div style={{height:'100%',width:grpPct+'%',background:g.cor,borderRadius:'99px',transition:'width .4s'}}/>
                     </div>
                   </div>
                   <div style={{fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:g.cor,flexShrink:0}}>
@@ -325,7 +325,7 @@ export default function Album() {
                           <div style={{fontFamily:'Barlow Condensed',fontSize:'13px',fontWeight:'700',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.n}</div>
                           <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'3px'}}>
                             <div style={{flex:1,height:'3px',background:'rgba(255,255,255,0.08)',borderRadius:'99px',overflow:'hidden'}}>
-                              <div style={{height:'100%',width:`${Math.round((ph/20)*100)}%`,background:g.cor,borderRadius:'99px'}}/>
+                              <div style={{height:'100%',width:Math.round((ph/20)*100)+'%',background:g.cor,borderRadius:'99px'}}/>
                             </div>
                             <span style={{fontSize:'9px',color:'rgba(255,255,255,0.5)',fontWeight:'700',flexShrink:0}}>{ph}/20</span>
                           </div>
