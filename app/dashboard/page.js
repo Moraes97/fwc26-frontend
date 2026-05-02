@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [tab, setTab] = useState('trocas')
   const [matches, setMatches] = useState([])
   const [ranking, setRanking] = useState([])
+  const [albumPct, setAlbumPct] = useState(0)
+  const [albumHave, setAlbumHave] = useState(0)
   const [loading, setLoading] = useState(true)
   const [countdown, setCountdown] = useState({d:'--',h:'--',m:'--',s:'--'})
 
@@ -30,10 +32,20 @@ export default function Dashboard() {
 
   async function loadData() {
     try {
-      const [meRes, matchRes, rankRes] = await Promise.all([auth.me(), trades.matches(), users.ranking()])
+      const token = Cookies.get('token')
+      const [meRes, matchRes, rankRes, albumRes] = await Promise.all([
+        auth.me(), trades.matches(), users.ranking(),
+        fetch(process.env.NEXT_PUBLIC_API_URL + '/api/album', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()).catch(() => ({ stickers: [] }))
+      ])
       setUser(meRes.data)
       setMatches(matchRes.data || [])
       setRanking(rankRes.data || [])
+      // Calcula percentual do album
+      const total = 960
+      const have = (albumRes.stickers || []).filter(s => s.status === 'HAVE' || s.status === 'REPEATED').length
+      const pct = Math.round((have / total) * 100)
+      setAlbumPct(pct)
+      setAlbumHave(have)
     } catch { router.push('/login') }
     finally { setLoading(false) }
   }
@@ -93,7 +105,7 @@ export default function Dashboard() {
               <div style={{fontFamily:'Barlow Condensed',fontSize:'24px',fontWeight:'900',color:'white',marginBottom:'4px'}}>Olá, {user?.name?.split(' ')[0]}! 👋</div>
               <div style={{fontSize:'12px',color:'rgba(255,255,255,0.7)'}}>Complete seu álbum e encontre matches perfeitos</div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',marginTop:'14px'}}>
-                {[['0','MATCHES'],['0','TROCAS'],['0%','ÁLBUM']].map(([v,l]) => (
+                {[['0','MATCHES'],['0','TROCAS'],[albumPct+'%','ÁLBUM']].map(([v,l]) => (
                   <div key={l} style={{background:'rgba(255,255,255,0.12)',borderRadius:'8px',padding:'8px',textAlign:'center'}}>
                     <div style={{fontFamily:'Barlow Condensed',fontSize:'20px',fontWeight:'900',color:'white'}}>{v}</div>
                     <div style={{fontSize:'8px',color:'rgba(255,255,255,0.6)',letterSpacing:'.5px',fontWeight:'700'}}>{l}</div>
