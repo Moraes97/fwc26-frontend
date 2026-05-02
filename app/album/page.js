@@ -56,7 +56,6 @@ export default function Album() {
     text2: 'rgba(0,0,0,0.5)', text3: 'rgba(0,0,0,0.3)', header: 'rgba(240,242,245,0.95)',
     stkBg: 'rgba(0,0,0,0.05)', stkBorder: 'rgba(0,0,0,0.12)', stkText: 'rgba(0,0,0,0.3)'
   }
-  }
 
   useEffect(() => {
     const token = Cookies.get('token')
