@@ -775,37 +775,33 @@ export default function Album() {
                     {/* PAG 2 */}
                     <div style={{ fontSize: '9px', fontWeight: '700', letterSpacing: '1px', color: 'rgba(255,255,255,0.3)', marginBottom: '6px', textAlign: 'center' }}>PÁGINA 2</div>
 
-                    {/* Linha 1: 11-12 */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '6px', marginBottom: '6px' }}>
+                    {/* Linha 1: 11, 12, 13 (time perfilado) na mesma fila */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', marginBottom: '6px' }}>
                       {[11,12].map(n => {
                         const code = modal.pais.c + '_' + String(n).padStart(2, '0')
                         return <StickerBtn key={code} code={code} label={String(n)} cor={modal.grupo.cor} />
                       })}
-                    </div>
-
-                    {/* Linha 2: 13 (time perfilado - maior) */}
-                    <div style={{ marginBottom: '6px' }}>
                       {(() => {
                         const code = modal.pais.c + '_13'
                         return (
-                          <div style={{ position: 'relative' }}>
+                          <div key={13} style={{ position: 'relative' }}>
                             <div onClick={() => togStk(code)}
-                              style={{ borderRadius: '10px', padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', userSelect: 'none', transition: 'all .12s',
+                              style={{ borderRadius: '10px', padding: '8px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', userSelect: 'none', transition: 'all .12s',
                                 background: getStatus(code) === 'HAVE' ? modal.grupo.cor : getRep(code) > 0 ? '#b8860b' : 'rgba(255,255,255,0.04)',
                                 border: '2px solid ' + (getStatus(code) === 'HAVE' ? modal.grupo.cor : getRep(code) > 0 ? '#F5C518' : 'rgba(255,255,255,0.07)') }}>
-                              <div style={{ fontSize: '11px', marginBottom: '2px' }}>📸</div>
-                              <div style={{ fontFamily: 'Barlow Condensed', fontSize: '20px', fontWeight: '900', color: getStatus(code) === 'HAVE' ? 'white' : getRep(code) > 0 ? '#F5C518' : 'rgba(255,255,255,0.3)' }}>13</div>
-                              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>TIME PERFILADO</div>
-                              {getRep(code) > 0 && <div style={{ fontSize: '10px', color: '#F5C518', fontWeight: '900', marginTop: '2px' }}>{getRep(code)}x REP</div>}
+                              <div style={{ fontSize: '10px', marginBottom: '1px' }}>📸</div>
+                              <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: getStatus(code) === 'HAVE' ? 'white' : getRep(code) > 0 ? '#F5C518' : 'rgba(255,255,255,0.3)' }}>13</div>
+                              <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>PERF.</div>
+                              {getRep(code) > 0 && <div style={{ fontSize: '9px', color: '#F5C518', fontWeight: '900' }}>{getRep(code)}x</div>}
                             </div>
                             {(getStatus(code) === 'HAVE' || getRep(code) > 0) && (
-                              <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginTop: '3px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'center', gap: '3px', marginTop: '3px' }}>
                                 <button onClick={e => { e.stopPropagation(); updateSticker(code, 'MISSING', 0); setToast('Removida'); setTimeout(()=>setToast(null),1000) }}
-                                  style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.5)', fontSize: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+                                  style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.5)', fontSize: '9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
                                 {getRep(code) > 0 && <>
-                                  <button onClick={e => { e.stopPropagation(); removeRep(code) }} style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.4)', color: '#E8175D', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>-</button>
-                                  <span style={{ fontFamily: 'Barlow Condensed', fontSize: '11px', fontWeight: '900', color: '#F5C518', minWidth: '14px', textAlign: 'center', lineHeight: '20px' }}>{getRep(code)}</span>
-                                  <button onClick={e => { e.stopPropagation(); addRep(code) }} style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#22C55E', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+                                  <button onClick={e => { e.stopPropagation(); removeRep(code) }} style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.4)', color: '#E8175D', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>-</button>
+                                  <span style={{ fontFamily: 'Barlow Condensed', fontSize: '10px', fontWeight: '900', color: '#F5C518', lineHeight: '18px' }}>{getRep(code)}</span>
+                                  <button onClick={e => { e.stopPropagation(); addRep(code) }} style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#22C55E', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
                                 </>}
                               </div>
                             )}
