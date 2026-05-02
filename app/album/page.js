@@ -197,6 +197,7 @@ export default function Album() {
       if (repQty > 0) updated[code + '_r'] = repQty
       else delete updated[code + '_r']
     }
+    console.log('updateSticker:', code, status, repQty, 'val:', updated[code], 'rep:', updated[code+'_r'])
     setStickers(updated)
     localStorage.setItem('fwc26_album', JSON.stringify(updated))
     const bankStatus = repQty > 0 ? 'REPEATED' : 'HAVE'
