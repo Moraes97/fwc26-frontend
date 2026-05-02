@@ -372,8 +372,12 @@ export default function Album() {
               </div>
             )}
           </div>
+          <button onClick={forceSave} disabled={saving}
+            style={{ padding: '5px 12px', borderRadius: '99px', background: saving ? 'rgba(245,197,24,0.15)' : 'rgba(34,197,94,0.15)', border: '1px solid ' + (saving ? '#F5C518' : '#22C55E'), color: saving ? '#F5C518' : '#22C55E', fontFamily: 'Barlow Condensed', fontSize: '11px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
+            {saving ? 'SALVANDO...' : '💾 SALVAR'}
+          </button>
           <div style={{ fontSize: '11px', color: saving ? '#F5C518' : 'rgba(255,255,255,0.3)', fontWeight: '700', flexShrink: 0 }}>
-            {saving ? 'Salvando...' : ('✓ ' + pct + '%')}
+            {'✓ ' + pct + '%'}
           </div>
         </div>
       </div>
