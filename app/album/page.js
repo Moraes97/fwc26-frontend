@@ -245,8 +245,9 @@ export default function Album() {
   const total = allCodes.length
   const have = allCodes.filter(c => getStatus(c) === 'HAVE').length
   const haveOrRep = allCodes.filter(c => getStatus(c) !== 'MISSING').length
+  const noAlbum = haveOrRep  // coladas + repetidas = todas que tem fisicamente
   const repeated = allCodes.filter(c => getStatus(c) === 'REPEATED').length
-  const pct = Math.round((have / total) * 100)
+  const pct = Math.round((haveOrRep / total) * 100)
 
   const missingList = GRUPOS.flatMap(g => g.p.flatMap(p =>
     Array.from({ length: 20 }, (_, i) => {
@@ -559,7 +560,7 @@ export default function Album() {
                 <div style={{ height: '100%', width: (pct + '%'), background: 'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)', borderRadius: '99px', transition: 'width .5s' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
-                {[['TENHO', have - repeated, '#22C55E'], ['REPETIDAS', repeated, '#F5C518'], ['FALTAM', total - have, '#E8175D']].map(item => (
+                {[['TENHO', have - repeated, '#22C55E'], ['REPETIDAS', repeated, '#F5C518'], ['FALTAM', total - haveOrRep, '#E8175D']].map(item => (
                   <div key={item[0]} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '10px 6px', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <div style={{ fontFamily: 'Barlow Condensed', fontSize: '24px', fontWeight: '900', color: item[2], lineHeight: '1' }}>{item[1]}</div>
                     <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', fontWeight: '700', marginTop: '2px' }}>{item[0]}</div>
