@@ -200,7 +200,8 @@ export default function Album() {
     Array.from({ length: 20 }, (_, i) => p.c + '_' + String(i + 1).padStart(2, '0'))
   ))
   const total = allCodes.length
-  const have = allCodes.filter(c => getStatus(c) !== 'MISSING').length
+  const have = allCodes.filter(c => getStatus(c) === 'HAVE').length
+  const haveOrRep = allCodes.filter(c => getStatus(c) !== 'MISSING').length
   const repeated = allCodes.filter(c => getStatus(c) === 'REPEATED').length
   const pct = Math.round((have / total) * 100)
 
