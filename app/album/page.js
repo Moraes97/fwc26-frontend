@@ -68,37 +68,54 @@ export default function Album() {
     const timer = setTimeout(() => saveToBank(), 2000)
     return () => clearTimeout(timer)
   }, [pendingUpdates])
+
   async function loadAlbum(token) {
+    // Carrega localStorage primeiro (resposta imediata)
     const saved = localStorage.getItem('fwc26_album')
     const local = saved ? JSON.parse(saved) : {}
-    const localCount = Object.keys(local).filter(k => !k.endsWith('_r') && local[k] === 1).length
-    if (localCount > 0) { setStickers(local); setLoading(false) }
+    const localCount = Object.keys(local).filter(k => !k.endsWith('_qty')).length
+
     try {
       const res = await fetch(API + '/api/album', { headers: { Authorization: 'Bearer ' + token } })
       if (res.ok) {
         const data = await res.json()
         const bankMap = {}
         data.stickers?.forEach(s => {
-          bankMap[s.sticker.code] = 1
-          const rep = (s.quantity || 1) - 1
-          if (rep > 0) bankMap[s.sticker.code + '_r'] = rep
+          bankMap[s.sticker.code] = s.status
+          if (s.quantity > 1) bankMap[s.sticker.code + '_qty'] = s.quantity
         })
-        const bankCount = Object.keys(bankMap).filter(k => !k.endsWith('_r')).length
-        const merged = {}
-        Object.keys(bankMap).forEach(k => { merged[k] = bankMap[k] })
-        Object.keys(local).forEach(k => {
-          if (!k.endsWith('_r') && local[k] === 1) merged[k] = 1
-          else if (k.endsWith('_r')) merged[k] = Math.max(local[k]||0, merged[k]||0)
-        })
-        const mergedCount = Object.keys(merged).filter(k => !k.endsWith('_r') && merged[k] === 1).length
-        console.log('local=' + localCount + ' bank=' + bankCount + ' merged=' + mergedCount)
-        setStickers(merged)
-        localStorage.setItem('fwc26_album', JSON.stringify(merged))
-        if (mergedCount > bankCount) syncAllToBank(token, merged).catch(() => {})
+        const bankCount = Object.keys(bankMap).filter(k => !k.endsWith('_qty')).length
+
+        if (localCount >= bankCount) {
+          // localStorage tem mais ou igual — SEMPRE usa local
+          setStickers(local)
+          // Sincroniza banco em background se necessário
+          if (localCount > bankCount) {
+            syncAllToBank(token, local).catch(() => {})
+          }
+        } else {
+          // Banco tem MAIS dados — merge favorecendo banco
+          const merged = Object.assign({}, local)
+          Object.keys(bankMap).forEach(k => {
+            if (k.endsWith('_qty')) { merged[k] = bankMap[k]; return }
+            const ls = local[k] || 'MISSING'
+            const bs = bankMap[k] || 'MISSING'
+            const p = { REPEATED: 3, HAVE: 2, MISSING: 1 }
+            merged[k] = (p[ls] || 1) >= (p[bs] || 1) ? ls : bs
+          })
+          const mergedCount = Object.keys(merged).filter(k => !k.endsWith('_qty') && merged[k] !== 'MISSING').length
+          setStickers(merged)
+          localStorage.setItem('fwc26_album', JSON.stringify(merged))
+          console.log('Merged: local=' + localCount + ' bank=' + bankCount + ' result=' + mergedCount)
+        }
+      } else {
+        // Erro na API — usa localStorage
+        if (localCount > 0) setStickers(local)
       }
-    } catch(e) { console.error('loadAlbum error:', e) }
-    finally { setLoading(false) }
-  }
+    } catch(e) {
+      console.error('loadAlbum error:', e)
+      if (localCount > 0) setStickers(local)
+    } finally { setLoading(false) }
   }
 
   async function saveToBank() {
