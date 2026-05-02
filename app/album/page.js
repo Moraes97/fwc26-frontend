@@ -187,6 +187,15 @@ export default function Album() {
     setSearchResults(results.slice(0, 20))
   }, [search])
 
+  const allPaises = GRUPOS.flatMap(g => g.p.map(p => ({ ...p, grupo: g })))
+
+  function navModal(dir) {
+    if (!modal || modal.especial) return
+    const idx = allPaises.findIndex(p => p.c === modal.pais.c)
+    const next = allPaises[(idx + dir + allPaises.length) % allPaises.length]
+    setModal({ pais: next, grupo: next.grupo })
+  }
+
   const allCodes = GRUPOS.flatMap(g => g.p.flatMap(p =>
     Array.from({ length: 20 }, (_, i) => p.c + '_' + String(i + 1).padStart(2, '0'))
   ))
@@ -585,7 +594,15 @@ export default function Album() {
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(8px)' }}
           onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div style={{ width: '100%', maxWidth: '620px', background: '#0d0d0d', borderRadius: '20px 20px 0 0', border: '2px solid rgba(255,255,255,0.1)', borderBottom: 'none', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+          <div
+            onTouchStart={e => { if(!modal.especial) window._ts = e.touches[0].clientX }}
+            onTouchEnd={e => {
+              if (!modal.especial || !window._ts) return
+              const diff = window._ts - e.changedTouches[0].clientX
+              if (Math.abs(diff) > 50) navModal(diff > 0 ? 1 : -1)
+              window._ts = null
+            }}
+            style={{ width: '100%', maxWidth: '620px', background: '#0d0d0d', borderRadius: '20px 20px 0 0', border: '2px solid rgba(255,255,255,0.1)', borderBottom: 'none', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
               {modal.especial ? (
                 <div style={{ width: '48px', height: '32px', borderRadius: '8px', background: modal.especial.cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>{modal.especial.icone}</div>
@@ -600,10 +617,24 @@ export default function Album() {
                   {modal.especial ? modal.especial.desc : ('Grupo ' + modal.grupo.n + ' · ' + pHave(modal.pais) + '/20')}
                 </div>
               </div>
-              <button onClick={() => setModal(null)}
-                style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                X
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                {!modal.especial && (
+                  <button onClick={() => navModal(-1)}
+                    style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    ←
+                  </button>
+                )}
+                {!modal.especial && (
+                  <button onClick={() => navModal(1)}
+                    style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    →
+                  </button>
+                )}
+                <button onClick={() => setModal(null)}
+                  style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  X
+                </button>
+              </div>
             </div>
             <div style={{ padding: '6px 20px', fontSize: '10px', color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
               Toque = marcar / - e + = ajustar repetidas
