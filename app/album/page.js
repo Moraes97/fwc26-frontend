@@ -577,7 +577,7 @@ export default function Album() {
                 <div style={{ height: '100%', width: (pct + '%'), background: 'linear-gradient(90deg,#E8175D,#FF6B00,#F5C518)', borderRadius: '99px', transition: 'width .5s' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
-                {[['TENHO', have - repeated, '#22C55E'], ['REPETIDAS', repeated, '#F5C518'], ['FALTAM', total - haveOrRep, '#E8175D']].map(item => (
+                {[['NO ALBUM', have, '#22C55E'], ['REPETIDAS', repeated, '#F5C518'], ['FALTAM', total - haveOrRep, '#E8175D']].map(item => (
                   <div key={item[0]} style={{ background: T.card2, borderRadius: '10px', padding: '10px 6px', border: '1px solid ' + T.border }}>
                     <div style={{ fontFamily: 'Barlow Condensed', fontSize: '24px', fontWeight: '900', color: item[2], lineHeight: '1' }}>{item[1]}</div>
                     <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', fontWeight: '700', marginTop: '2px' }}>{item[0]}</div>
