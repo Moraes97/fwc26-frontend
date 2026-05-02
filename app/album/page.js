@@ -118,13 +118,18 @@ export default function Album() {
       })
       setPendingUpdates([])
     } catch {
-    } finally { setSaving(false) }
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function syncAllToBank(token, data) {
     const updates = Object.entries(data)
-      .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
-      .map(([k,v]) => ({ stickerCode: k, status: v, quantity: data[k+'_qty'] || 1 }))
+      .filter(([k,v]) => !k.endsWith('_r') && v === 1)
+      .map(([k,v]) => {
+        const rep = data[k+'_r'] || 0
+        return { stickerCode: k, status: rep > 0 ? 'REPEATED' : 'HAVE', quantity: rep > 0 ? rep : 1 }
+      })
     if (updates.length === 0) return
     const batchSize = 50
     for (let i = 0; i < updates.length; i += batchSize) {
@@ -142,8 +147,11 @@ export default function Album() {
     if (!token) return
     setSaving(true)
     const updates = Object.entries(stickers)
-      .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
-      .map(([k,v]) => ({ stickerCode: k, status: v, quantity: stickers[k+'_qty'] || 1 }))
+      .filter(([k,v]) => !k.endsWith('_r') && v === 1)
+      .map(([k,v]) => {
+        const rep = stickers[k+'_r'] || 0
+        return { stickerCode: k, status: rep > 0 ? 'REPEATED' : 'HAVE', quantity: rep > 0 ? rep : 1 }
+      })
     try {
       await fetch(API + '/api/album/stickers', {
         method: 'PATCH',
@@ -159,18 +167,25 @@ export default function Album() {
     } finally { setSaving(false) }
   }
 
-  function getStatus(code) { return stickers[code] || 'MISSING' }
-  function getQty(code) { return stickers[code + '_qty'] || 1 }
+  function getStatus(code) {
+    const v = stickers[code]
+    if (!v || v === 0) return 'MISSING'
+    return 'HAVE'
+  }
+  function getRep(code) { return stickers[code + '_r'] || 0 }
+  function getQty(code) { return stickers[code + '_r'] || 0 }
 
   function updateSticker(code, status, qty) {
     const updated = Object.assign({}, stickers)
     if (status === 'MISSING') {
       delete updated[code]
-      delete updated[code + '_qty']
-    } else {
-      updated[code] = status
-      if (qty > 1) updated[code + '_qty'] = qty
-      else delete updated[code + '_qty']
+      delete updated[code + '_r']
+    } else if (status === 'HAVE') {
+      updated[code] = 1
+      delete updated[code + '_r']
+    } else if (status === 'REPEATED') {
+      updated[code] = 1
+      updated[code + '_r'] = qty
     }
     setStickers(updated)
     localStorage.setItem('fwc26_album', JSON.stringify(updated))
@@ -192,20 +207,20 @@ export default function Album() {
   }
 
   function addRep(code) {
-    const qty = Math.min(getQty(code) + 1, 8)
+    const qty = Math.min(getRep(code) + 1, 9)
     updateSticker(code, 'REPEATED', qty)
-    setToast(qty + 'x repetidas!')
+    setToast(qty + 'x repetida!')
     setTimeout(() => setToast(null), 1000)
   }
 
   function removeRep(code) {
-    const curQty = getQty(code)
-    if (curQty <= 1) {
-      updateSticker(code, 'HAVE', 1)
+    const curRep = getRep(code)
+    if (curRep <= 1) {
+      updateSticker(code, 'HAVE', 0)
       setToast('Voltou para TENHO')
     } else {
-      updateSticker(code, 'REPEATED', curQty - 1)
-      setToast((curQty - 1) + 'x repetidas')
+      updateSticker(code, 'REPEATED', curRep - 1)
+      setToast((curRep - 1) + 'x repetida')
     }
     setTimeout(() => setToast(null), 1000)
   }
@@ -244,9 +259,9 @@ export default function Album() {
   ))
   const total = allCodes.length
   const have = allCodes.filter(c => getStatus(c) === 'HAVE').length
-  const haveOrRep = allCodes.filter(c => getStatus(c) !== 'MISSING').length
+  const haveOrRep = allCodes.filter(c => getStatus(c) === 'HAVE').length
   const noAlbum = haveOrRep  // coladas + repetidas = todas que tem fisicamente
-  const repeated = allCodes.filter(c => getStatus(c) === 'REPEATED').length
+  const repeated = allCodes.filter(c => getRep(c) > 0).length
   const pct = Math.round((haveOrRep / total) * 100)
 
   const missingList = GRUPOS.flatMap(g => g.p.flatMap(p =>
@@ -281,8 +296,9 @@ export default function Album() {
   function StickerBtn({ code, label, cor }) {
     const st = getStatus(code)
     const qty = getQty(code)
+    const rep = getRep(code)
     const isHave = st === 'HAVE'
-    const isRep = st === 'REPEATED'
+    const isRep = rep > 0
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
         <div onClick={() => togStk(code)}
@@ -296,8 +312,8 @@ export default function Album() {
           <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: isHave ? 'white' : isRep ? '#F5C518' : 'rgba(255,255,255,0.3)', lineHeight: '1', marginBottom: '1px' }}>
             {label}
           </div>
-          <div style={{ fontSize: '10px', color: isHave ? 'rgba(255,255,255,0.8)' : isRep ? '#F5C518' : 'transparent', lineHeight: '1' }}>
-            {isHave ? 'TENHO' : isRep ? (qty + 'x') : '-'}
+          <div style={{ fontSize: '10px', color: isHave && !isRep ? 'rgba(255,255,255,0.8)' : isRep ? '#F5C518' : 'transparent', lineHeight: '1' }}>
+            {isRep ? (rep + 'x REP') : isHave ? 'TENHO' : '-'}
           </div>
         </div>
         {(isHave || isRep) && (
@@ -311,7 +327,7 @@ export default function Album() {
                 style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.5)', color: '#E8175D', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
                 -
               </button>
-              <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '900', color: '#F5C518', minWidth: '16px', textAlign: 'center' }}>{qty}</span>
+              <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '900', color: '#F5C518', minWidth: '16px', textAlign: 'center' }}>{getRep(code)}</span>
               <button onClick={e => { e.stopPropagation(); addRep(code) }}
                 style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
                 +
