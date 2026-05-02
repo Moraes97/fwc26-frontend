@@ -74,26 +74,27 @@ export default function Album() {
         })
         const bankCount = Object.keys(bankMap).filter(k => !k.endsWith('_qty')).length
 
-        if (localCount > bankCount) {
-          // localStorage tem MAIS dados — usa local e sincroniza com banco
+        if (localCount >= bankCount) {
+          // localStorage tem mais ou igual — SEMPRE usa local
           setStickers(local)
-          const updates = Object.entries(local)
-            .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
-            .map(([k,v]) => ({ stickerCode: k, status: v, quantity: local[k+'_qty'] || 1 }))
-          if (updates.length > 0) {
-            fetch(API + '/api/album/stickers', {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-              body: JSON.stringify({ updates })
-            }).catch(e => console.error('Sync error:', e))
+          // Sincroniza banco em background se necessário
+          if (localCount > bankCount) {
+            syncAllToBank(token, local).catch(() => {})
           }
-        } else if (bankCount > 0) {
-          // Banco tem dados iguais ou mais — usa banco
-          setStickers(bankMap)
-          localStorage.setItem('fwc26_album', JSON.stringify(bankMap))
         } else {
-          // Ambos vazios
-          setStickers({})
+          // Banco tem MAIS dados — merge favorecendo banco
+          const merged = Object.assign({}, local)
+          Object.keys(bankMap).forEach(k => {
+            if (k.endsWith('_qty')) { merged[k] = bankMap[k]; return }
+            const ls = local[k] || 'MISSING'
+            const bs = bankMap[k] || 'MISSING'
+            const p = { REPEATED: 3, HAVE: 2, MISSING: 1 }
+            merged[k] = (p[ls] || 1) >= (p[bs] || 1) ? ls : bs
+          })
+          const mergedCount = Object.keys(merged).filter(k => !k.endsWith('_qty') && merged[k] !== 'MISSING').length
+          setStickers(merged)
+          localStorage.setItem('fwc26_album', JSON.stringify(merged))
+          console.log('Merged: local=' + localCount + ' bank=' + bankCount + ' result=' + mergedCount)
         }
       } else {
         // Erro na API — usa localStorage
