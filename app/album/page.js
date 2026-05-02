@@ -58,46 +58,50 @@ export default function Album() {
   }, [pendingUpdates])
 
   async function loadAlbum(token) {
+    // Carrega localStorage primeiro (resposta imediata)
+    const saved = localStorage.getItem('fwc26_album')
+    const local = saved ? JSON.parse(saved) : {}
+    const localCount = Object.keys(local).filter(k => !k.endsWith('_qty')).length
+
     try {
       const res = await fetch(API + '/api/album', { headers: { Authorization: 'Bearer ' + token } })
       if (res.ok) {
         const data = await res.json()
-        const map = {}
+        const bankMap = {}
         data.stickers?.forEach(s => {
-          map[s.sticker.code] = s.status
-          if (s.quantity > 1) map[s.sticker.code + '_qty'] = s.quantity
+          bankMap[s.sticker.code] = s.status
+          if (s.quantity > 1) bankMap[s.sticker.code + '_qty'] = s.quantity
         })
-        // Se banco tem dados, usa banco. Se banco vazio, tenta localStorage
-        if (Object.keys(map).length > 0) {
-          setStickers(map)
-          localStorage.setItem('fwc26_album', JSON.stringify(map))
-        } else {
-          const saved = localStorage.getItem('fwc26_album')
-          if (saved) {
-            const parsed = JSON.parse(saved)
-            setStickers(parsed)
-            // Re-envia dados do localStorage para o banco
-            const updates = Object.entries(parsed)
-              .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
-              .map(([k,v]) => ({ stickerCode: k, status: v, quantity: parsed[k+'_qty'] || 1 }))
-            if (updates.length > 0) {
-              fetch(API + '/api/album/stickers', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-                body: JSON.stringify({ updates })
-              }).then(() => console.log('Sync: ' + updates.length + ' figurinhas sincronizadas com o banco'))
-              .catch(e => console.error('Sync error:', e))
-            }
+        const bankCount = Object.keys(bankMap).filter(k => !k.endsWith('_qty')).length
+
+        if (localCount > bankCount) {
+          // localStorage tem MAIS dados — usa local e sincroniza com banco
+          setStickers(local)
+          const updates = Object.entries(local)
+            .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
+            .map(([k,v]) => ({ stickerCode: k, status: v, quantity: local[k+'_qty'] || 1 }))
+          if (updates.length > 0) {
+            fetch(API + '/api/album/stickers', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+              body: JSON.stringify({ updates })
+            }).catch(e => console.error('Sync error:', e))
           }
+        } else if (bankCount > 0) {
+          // Banco tem dados iguais ou mais — usa banco
+          setStickers(bankMap)
+          localStorage.setItem('fwc26_album', JSON.stringify(bankMap))
+        } else {
+          // Ambos vazios
+          setStickers({})
         }
       } else {
-        const saved = localStorage.getItem('fwc26_album')
-        if (saved) setStickers(JSON.parse(saved))
+        // Erro na API — usa localStorage
+        if (localCount > 0) setStickers(local)
       }
     } catch(e) {
       console.error('loadAlbum error:', e)
-      const saved = localStorage.getItem('fwc26_album')
-      if (saved) setStickers(JSON.parse(saved))
+      if (localCount > 0) setStickers(local)
     } finally { setLoading(false) }
   }
 
