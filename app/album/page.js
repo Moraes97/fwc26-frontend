@@ -299,7 +299,8 @@ export default function Album() {
   const repeatedByPais = GRUPOS.flatMap(g => g.p.map(p => {
     const items = Array.from({ length: 20 }, (_, i) => {
       const code = p.c + '_' + String(i + 1).padStart(2, '0')
-      return getStatus(code) === 'REPEATED' ? { code, num: i + 1, qty: getQty(code) } : null
+      const rep = getRep(code)
+      return rep > 0 ? { code, num: i + 1, qty: rep } : null
     }).filter(Boolean)
     return items.length > 0 ? { pais: p, grupo: g, items } : null
   })).filter(Boolean)
@@ -455,7 +456,7 @@ export default function Album() {
                       <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '700' }}>{group.pais.n}</div>
                       <div style={{ fontSize: '10px', color: T.text2 }}>Grupo {group.grupo.n}</div>
                     </div>
-                    <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: '#F5C518' }}>{group.items.length} fig.</div>
+                    <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: '#F5C518' }}>{group.items.reduce((s,i) => s+i.qty, 0)}x rep.</div>
                   </div>
                   <div style={{ padding: '10px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {group.items.map(item => (
