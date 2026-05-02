@@ -120,6 +120,22 @@ export default function Album() {
     } finally { setSaving(false) }
   }
 
+  async function syncAllToBank(token, data) {
+    const updates = Object.entries(data)
+      .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
+      .map(([k,v]) => ({ stickerCode: k, status: v, quantity: data[k+'_qty'] || 1 }))
+    if (updates.length === 0) return
+    const batchSize = 50
+    for (let i = 0; i < updates.length; i += batchSize) {
+      const batch = updates.slice(i, i + batchSize)
+      await fetch(API + '/api/album/stickers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ updates: batch })
+      }).catch(() => {})
+    }
+  }
+
   async function forceSave() {
     const token = Cookies.get('token')
     if (!token) return
