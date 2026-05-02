@@ -60,15 +60,42 @@ export default function Album() {
   async function loadAlbum(token) {
     try {
       const res = await fetch(API + '/api/album', { headers: { Authorization: 'Bearer ' + token } })
-      if (!res.ok) throw new Error()
-      const data = await res.json()
-      const map = {}
-      data.stickers?.forEach(s => {
-        map[s.sticker.code] = s.status
-        if (s.quantity > 1) map[s.sticker.code + '_qty'] = s.quantity
-      })
-      setStickers(map)
-    } catch {
+      if (res.ok) {
+        const data = await res.json()
+        const map = {}
+        data.stickers?.forEach(s => {
+          map[s.sticker.code] = s.status
+          if (s.quantity > 1) map[s.sticker.code + '_qty'] = s.quantity
+        })
+        // Se banco tem dados, usa banco. Se banco vazio, tenta localStorage
+        if (Object.keys(map).length > 0) {
+          setStickers(map)
+          localStorage.setItem('fwc26_album', JSON.stringify(map))
+        } else {
+          const saved = localStorage.getItem('fwc26_album')
+          if (saved) {
+            const parsed = JSON.parse(saved)
+            setStickers(parsed)
+            // Re-envia dados do localStorage para o banco
+            const updates = Object.entries(parsed)
+              .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
+              .map(([k,v]) => ({ stickerCode: k, status: v, quantity: parsed[k+'_qty'] || 1 }))
+            if (updates.length > 0) {
+              fetch(API + '/api/album/stickers', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                body: JSON.stringify({ updates })
+              }).then(() => console.log('Sync: ' + updates.length + ' figurinhas sincronizadas com o banco'))
+              .catch(e => console.error('Sync error:', e))
+            }
+          }
+        }
+      } else {
+        const saved = localStorage.getItem('fwc26_album')
+        if (saved) setStickers(JSON.parse(saved))
+      }
+    } catch(e) {
+      console.error('loadAlbum error:', e)
       const saved = localStorage.getItem('fwc26_album')
       if (saved) setStickers(JSON.parse(saved))
     } finally { setLoading(false) }
