@@ -71,6 +71,28 @@ export default function Album() {
   async function loadAlbum(token) {
     const saved = localStorage.getItem('fwc26_album')
     const local = saved ? JSON.parse(saved) : {}
+    // MIGRACAO formato antigo (HAVE/REPEATED) para novo (1/_r)
+    const needsMigration = Object.values(local).some(v => v === 'HAVE' || v === 'REPEATED')
+    if (needsMigration) {
+      const migrated = {}
+      Object.entries(local).forEach(([k, v]) => {
+        if (k.endsWith('_qty')) {
+          const base = k.replace('_qty', '')
+          const repVal = parseInt(v) - 1
+          if (repVal > 0) migrated[base + '_r'] = repVal
+        } else if (v === 'HAVE') {
+          migrated[k] = 1
+        } else if (v === 'REPEATED') {
+          migrated[k] = 1
+          if (!migrated[k + '_r']) migrated[k + '_r'] = 1
+        }
+      })
+      Object.assign(local, migrated)
+      Object.keys(local).forEach(k => { if (local[k] === 'HAVE' || local[k] === 'REPEATED') delete local[k] })
+      Object.keys(local).forEach(k => { if (k.endsWith('_qty')) delete local[k] })
+      localStorage.setItem('fwc26_album', JSON.stringify(local))
+      console.log('Migracao concluida! Figurinhas:', Object.keys(local).filter(k => !k.endsWith('_r') && local[k] === 1).length)
+    }
     const localCount = Object.keys(local).filter(k => !k.endsWith('_r') && local[k] === 1).length
     if (localCount > 0) { setStickers(local); setLoading(false) }
     try {
