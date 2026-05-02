@@ -205,16 +205,12 @@ export default function Album() {
 
   function togStk(code) {
     const cur = getStatus(code)
-    const curQty = getQty(code)
-    let next, qty
-    if (cur === 'MISSING') { next = 'HAVE'; qty = 1 }
-    else if (cur === 'HAVE') { next = 'REPEATED'; qty = 1 }
-    else if (cur === 'REPEATED' && curQty < 9) { next = 'REPEATED'; qty = curQty + 1 }
-    else { next = 'MISSING'; qty = 0 }
-    updateSticker(code, next, qty)
-    const msg = next === 'HAVE' ? 'Tenho!' : next === 'REPEATED' ? (qty + 'x Repetidas!') : 'Removida'
-    setToast(msg)
-    setTimeout(() => setToast(null), 1200)
+    if (cur === 'MISSING') {
+      updateSticker(code, 'HAVE', 0)
+      setToast('Tenho!')
+      setTimeout(() => setToast(null), 1200)
+    }
+    // Se ja tem, nao faz nada — use X pra remover e + pra repetidas
   }
 
   function addRep(code) {
