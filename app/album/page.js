@@ -205,12 +205,15 @@ export default function Album() {
 
   function togStk(code) {
     const cur = getStatus(code)
+    const curRep = getRep(code)
     if (cur === 'MISSING') {
       updateSticker(code, 'HAVE', 0)
       setToast('Tenho!')
-      setTimeout(() => setToast(null), 1200)
+    } else if (curRep < 9) {
+      updateSticker(code, 'HAVE', curRep + 1)
+      setToast((curRep + 1) + 'x Repetida!')
     }
-    // Se ja tem, nao faz nada — use X pra remover e + pra repetidas
+    setTimeout(() => setToast(null), 1200)
   }
 
   function addRep(code) {
