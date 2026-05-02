@@ -120,6 +120,28 @@ export default function Album() {
     } finally { setSaving(false) }
   }
 
+  async function forceSave() {
+    const token = Cookies.get('token')
+    if (!token) return
+    setSaving(true)
+    const updates = Object.entries(stickers)
+      .filter(([k,v]) => !k.endsWith('_qty') && v !== 'MISSING')
+      .map(([k,v]) => ({ stickerCode: k, status: v, quantity: stickers[k+'_qty'] || 1 }))
+    try {
+      await fetch(API + '/api/album/stickers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ updates })
+      })
+      localStorage.setItem('fwc26_album', JSON.stringify(stickers))
+      setToast('Salvo no banco! (' + updates.length + ' figurinhas)')
+      setTimeout(() => setToast(null), 3000)
+    } catch {
+      setToast('Erro ao salvar. Tente novamente.')
+      setTimeout(() => setToast(null), 3000)
+    } finally { setSaving(false) }
+  }
+
   function getStatus(code) { return stickers[code] || 'MISSING' }
   function getQty(code) { return stickers[code + '_qty'] || 1 }
 
