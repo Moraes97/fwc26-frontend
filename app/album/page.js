@@ -73,6 +73,21 @@ export default function Album() {
     // Carrega localStorage primeiro (resposta imediata)
     const saved = localStorage.getItem('fwc26_album')
     const local = saved ? JSON.parse(saved) : {}
+    // Migra formato antigo HAVE/REPEATED para novo 1/_r
+    const needsMigration = Object.values(local).some(v => v === 'HAVE' || v === 'REPEATED')
+    if (needsMigration) {
+      const migrated = {}
+      Object.entries(local).forEach(([k, v]) => {
+        if (k.endsWith('_qty')) return
+        if (v === 'HAVE') migrated[k] = 1
+        else if (v === 'REPEATED') { migrated[k] = 1; migrated[k + '_r'] = 1 }
+      })
+      Object.assign(local, migrated)
+      Object.keys(local).forEach(k => {
+        if (local[k] === 'HAVE' || local[k] === 'REPEATED' || k.endsWith('_qty')) delete local[k]
+      })
+      localStorage.setItem('fwc26_album', JSON.stringify(local))
+    }
     const localCount = Object.keys(local).filter(k => !k.endsWith('_qty')).length
 
     try {
