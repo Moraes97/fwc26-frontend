@@ -168,6 +168,29 @@ export default function Album() {
   const repeated = allCodes.filter(c => getStatus(c) === 'REPEATED').length
   const pct = Math.round((have / total) * 100)
 
+  const missingList = GRUPOS.flatMap(g => g.p.flatMap(p =>
+    Array.from({ length: 20 }, (_, i) => {
+      const code = p.c + '_' + String(i + 1).padStart(2, '0')
+      return getStatus(code) === 'MISSING' ? { code, num: i + 1, pais: p, grupo: g } : null
+    }).filter(Boolean)
+  ))
+
+  const missingByPais = GRUPOS.flatMap(g => g.p.map(p => {
+    const items = Array.from({ length: 20 }, (_, i) => {
+      const code = p.c + '_' + String(i + 1).padStart(2, '0')
+      return getStatus(code) === 'MISSING' ? { code, num: i + 1 } : null
+    }).filter(Boolean)
+    return items.length > 0 ? { pais: p, grupo: g, items } : null
+  })).filter(Boolean)
+
+  const shinyList = GRUPOS.flatMap(g => g.p.flatMap(p =>
+    [19, 20].map(num => {
+      const code = p.c + '_' + String(num).padStart(2, '0')
+      return { code, num, pais: p, grupo: g, status: getStatus(code), qty: getQty(code) }
+    })
+  ))
+  const shinyHave = shinyList.filter(s => s.status !== 'MISSING').length
+
   const repeatedByPais = GRUPOS.flatMap(g => g.p.map(p => {
     const items = Array.from({ length: 20 }, (_, i) => {
       const code = p.c + '_' + String(i + 1).padStart(2, '0')
@@ -245,7 +268,15 @@ export default function Album() {
             </button>
             <button onClick={() => setActiveTab('repetidas')}
               style={{ padding: '5px 12px', borderRadius: '99px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', letterSpacing: '.5px', background: activeTab === 'repetidas' ? '#F5C518' : 'rgba(255,255,255,0.08)', color: activeTab === 'repetidas' ? '#0a0a0a' : 'rgba(255,255,255,0.5)' }}>
-              {'REPETIDAS (' + repeated + ')'}
+              {'REP (' + repeated + ')'}
+            </button>
+            <button onClick={() => setActiveTab('faltam')}
+              style={{ padding: '5px 12px', borderRadius: '99px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', letterSpacing: '.5px', background: activeTab === 'faltam' ? '#E8175D' : 'rgba(255,255,255,0.08)', color: activeTab === 'faltam' ? 'white' : 'rgba(255,255,255,0.5)' }}>
+              {'FALTAM (' + (total - have) + ')'}
+            </button>
+            <button onClick={() => setActiveTab('brilhantes')}
+              style={{ padding: '5px 12px', borderRadius: '99px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', letterSpacing: '.5px', background: activeTab === 'brilhantes' ? '#F5C518' : 'rgba(255,255,255,0.08)', color: activeTab === 'brilhantes' ? '#0a0a0a' : 'rgba(255,255,255,0.5)' }}>
+              {'BRILHANTES (' + shinyHave + '/96)'}
             </button>
           </div>
           <div style={{ flex: 1, position: 'relative', maxWidth: '340px', margin: '0 auto', minWidth: '120px' }}>
@@ -326,6 +357,104 @@ export default function Album() {
               ))}
             </div>
           )}
+        </div>
+      ) : activeTab === 'faltam' ? (
+        <div style={{ paddingTop: '60px', maxWidth: '1200px', margin: '0 auto', padding: '70px 20px 60px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ fontFamily: 'Barlow Condensed', fontSize: '28px', fontWeight: '900', marginBottom: '4px' }}>
+              FIGURINHAS <span style={{ color: '#E8175D' }}>FALTAM</span>
+            </div>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{(total - have) + ' figurinhas para completar o album'}</div>
+          </div>
+          {total - have === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.3)' }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🏆</div>
+              <div style={{ fontFamily: 'Barlow Condensed', fontSize: '22px', fontWeight: '700', color: '#F5C518' }}>ALBUM COMPLETO!</div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '12px' }}>
+              {missingByPais.map(group => (
+                <div key={group.pais.c} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(0,0,0,0.2)' }}>
+                    <img src={'https://flagcdn.com/w40/' + group.pais.f + '.png'} style={{ width: '36px', height: '24px', borderRadius: '5px', objectFit: 'cover', border: '1px solid ' + group.grupo.cor, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '700' }}>{group.pais.n}</div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Grupo {group.grupo.n}</div>
+                    </div>
+                    <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: '#E8175D' }}>{group.items.length + ' fig.'}</div>
+                  </div>
+                  <div style={{ padding: '10px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {group.items.map(item => (
+                      <div key={item.code} onClick={() => togStk(item.code)}
+                        style={{ background: 'rgba(232,23,93,0.08)', border: '1px solid rgba(232,23,93,0.25)', borderRadius: '7px', padding: '4px 10px', cursor: 'pointer' }}>
+                        <span style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900', color: '#E8175D' }}>{'#' + item.num}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : activeTab === 'brilhantes' ? (
+        <div style={{ paddingTop: '60px', maxWidth: '1200px', margin: '0 auto', padding: '70px 20px 60px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ fontFamily: 'Barlow Condensed', fontSize: '28px', fontWeight: '900', marginBottom: '4px' }}>
+              FIGURINHAS <span style={{ color: '#F5C518' }}>BRILHANTES</span>
+            </div>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{shinyHave + '/96 brilhantes coletadas (figurinhas 19 e 20 de cada selecao)'}</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '10px' }}>
+            {GRUPOS.map((g, gi) => (
+              <div key={gi} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,197,24,0.15)', borderRadius: '14px', overflow: 'hidden' }}>
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(245,197,24,0.1)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(245,197,24,0.04)' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: g.cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed', fontSize: '16px', fontWeight: '900', color: 'white', flexShrink: 0 }}>{g.n}</div>
+                  <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900' }}>GRUPO {g.n}</div>
+                  <div style={{ marginLeft: 'auto', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                    {g.p.reduce((a, p) => a + [19,20].filter(n => getStatus(p.c+'_'+String(n).padStart(2,'0')) !== 'MISSING').length, 0) + '/' + (g.p.length * 2)}
+                  </div>
+                </div>
+                <div style={{ padding: '10px', display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '6px' }}>
+                  {g.p.map(p => (
+                    <div key={p.c} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                        <img src={'https://flagcdn.com/w20/' + p.f + '.png'} style={{ width: '22px', height: '15px', borderRadius: '3px', objectFit: 'cover', flexShrink: 0 }} />
+                        <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.n}</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                        {[19, 20].map(num => {
+                          const code = p.c + '_' + String(num).padStart(2, '0')
+                          const st = getStatus(code)
+                          const qty = getQty(code)
+                          const isHave = st === 'HAVE'
+                          const isRep = st === 'REPEATED'
+                          return (
+                            <div key={num} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <div onClick={() => togStk(code)}
+                                style={{ borderRadius: '7px', padding: '6px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', transition: 'all .12s',
+                                  background: isHave ? 'linear-gradient(135deg,#b8860b,#F5C518)' : isRep ? 'linear-gradient(135deg,#b8860b,#F5C518)' : 'rgba(245,197,24,0.06)',
+                                  border: '1.5px solid ' + (isHave || isRep ? '#F5C518' : 'rgba(245,197,24,0.2)') }}>
+                                <div style={{ fontSize: '8px', color: 'rgba(245,197,24,0.6)', marginBottom: '1px' }}>⭐</div>
+                                <div style={{ fontFamily: 'Barlow Condensed', fontSize: '13px', fontWeight: '900', color: isHave || isRep ? '#0a0a0a' : 'rgba(245,197,24,0.5)', lineHeight: '1' }}>{num}</div>
+                                <div style={{ fontSize: '8px', color: isHave || isRep ? '#0a0a0a' : 'transparent', lineHeight: '1', marginTop: '1px' }}>{isHave ? 'TENHO' : isRep ? (qty+'x') : '-'}</div>
+                              </div>
+                              {isRep && (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                                  <button onClick={e => { e.stopPropagation(); removeRep(code) }} style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.4)', color: '#E8175D', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>-</button>
+                                  <span style={{ fontFamily: 'Barlow Condensed', fontSize: '10px', fontWeight: '900', color: '#F5C518' }}>{qty}</span>
+                                  <button onClick={e => { e.stopPropagation(); addRep(code) }} style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#22C55E', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div>
