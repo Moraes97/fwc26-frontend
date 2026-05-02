@@ -139,7 +139,7 @@ export default function Album() {
     const curQty = getQty(code)
     let next, qty
     if (cur === 'MISSING') { next = 'HAVE'; qty = 1 }
-    else if (cur === 'HAVE') { next = 'REPEATED'; qty = 2 }
+    else if (cur === 'HAVE') { next = 'REPEATED'; qty = 1 }
     else if (cur === 'REPEATED' && curQty < 9) { next = 'REPEATED'; qty = curQty + 1 }
     else { next = 'MISSING'; qty = 0 }
     updateSticker(code, next, qty)
@@ -149,7 +149,7 @@ export default function Album() {
   }
 
   function addRep(code) {
-    const qty = Math.min(getQty(code) + 1, 9)
+    const qty = Math.min(getQty(code) + 1, 8)
     updateSticker(code, 'REPEATED', qty)
     setToast(qty + 'x repetidas!')
     setTimeout(() => setToast(null), 1000)
@@ -157,7 +157,7 @@ export default function Album() {
 
   function removeRep(code) {
     const curQty = getQty(code)
-    if (curQty <= 2) {
+    if (curQty <= 1) {
       updateSticker(code, 'HAVE', 1)
       setToast('Voltou para TENHO')
     } else {
