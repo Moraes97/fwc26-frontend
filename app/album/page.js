@@ -175,21 +175,20 @@ export default function Album() {
   function getRep(code) { return stickers[code + '_r'] || 0 }
   function getQty(code) { return stickers[code + '_r'] || 0 }
 
-  function updateSticker(code, status, qty) {
+  function updateSticker(code, status, repQty) {
     const updated = Object.assign({}, stickers)
     if (status === 'MISSING') {
       delete updated[code]
       delete updated[code + '_r']
-    } else if (status === 'HAVE') {
+    } else {
       updated[code] = 1
-      delete updated[code + '_r']
-    } else if (status === 'REPEATED') {
-      updated[code] = 1
-      updated[code + '_r'] = qty
+      if (repQty > 0) updated[code + '_r'] = repQty
+      else delete updated[code + '_r']
     }
     setStickers(updated)
     localStorage.setItem('fwc26_album', JSON.stringify(updated))
-    setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status, quantity: qty }])
+    const bankStatus = repQty > 0 ? 'REPEATED' : 'HAVE'
+    setPendingUpdates(prev => [...prev.filter(u => u.stickerCode !== code), { stickerCode: code, status: bankStatus, quantity: repQty > 0 ? repQty : 1 }])
   }
 
   function togStk(code) {
@@ -208,20 +207,20 @@ export default function Album() {
 
   function addRep(code) {
     const qty = Math.min(getRep(code) + 1, 9)
-    updateSticker(code, 'REPEATED', qty)
+    if (getStatus(code) === 'MISSING') {
+      updateSticker(code, 'HAVE', qty)
+    } else {
+      updateSticker(code, 'HAVE', qty)
+    }
     setToast(qty + 'x repetida!')
     setTimeout(() => setToast(null), 1000)
   }
 
   function removeRep(code) {
     const curRep = getRep(code)
-    if (curRep <= 1) {
-      updateSticker(code, 'HAVE', 0)
-      setToast('Voltou para TENHO')
-    } else {
-      updateSticker(code, 'REPEATED', curRep - 1)
-      setToast((curRep - 1) + 'x repetida')
-    }
+    if (curRep <= 0) return
+    updateSticker(code, 'HAVE', curRep - 1)
+    setToast(curRep - 1 === 0 ? 'Repetidas removidas' : (curRep - 1) + 'x repetida')
     setTimeout(() => setToast(null), 1000)
   }
 
@@ -261,7 +260,7 @@ export default function Album() {
   const have = allCodes.filter(c => getStatus(c) === 'HAVE').length
   const haveOrRep = allCodes.filter(c => getStatus(c) === 'HAVE').length
   const noAlbum = haveOrRep  // coladas + repetidas = todas que tem fisicamente
-  const repeated = allCodes.filter(c => getRep(c) > 0).length
+  const repeated = allCodes.reduce((sum, c) => sum + getRep(c), 0)
   const pct = Math.round((haveOrRep / total) * 100)
 
   const missingList = GRUPOS.flatMap(g => g.p.flatMap(p =>
