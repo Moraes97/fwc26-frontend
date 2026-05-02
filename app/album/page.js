@@ -255,17 +255,23 @@ export default function Album() {
             {isHave ? 'TENHO' : isRep ? (qty + 'x') : '-'}
           </div>
         </div>
-        {isRep && (
+        {(isHave || isRep) && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }}>
-            <button onClick={e => { e.stopPropagation(); removeRep(code) }}
-              style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.5)', color: '#E8175D', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
-              -
+            <button onClick={e => { e.stopPropagation(); updateSticker(code, 'MISSING', 0); setToast('Removida') ; setTimeout(()=>setToast(null),1000) }}
+              style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.5)', fontSize: '11px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
+              ✕
             </button>
-            <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '900', color: '#F5C518', minWidth: '16px', textAlign: 'center' }}>{qty}</span>
-            <button onClick={e => { e.stopPropagation(); addRep(code) }}
-              style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
-              +
-            </button>
+            {isRep && <>
+              <button onClick={e => { e.stopPropagation(); removeRep(code) }}
+                style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.5)', color: '#E8175D', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
+                -
+              </button>
+              <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '900', color: '#F5C518', minWidth: '16px', textAlign: 'center' }}>{qty}</span>
+              <button onClick={e => { e.stopPropagation(); addRep(code) }}
+                style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
+                +
+              </button>
+            </>}
           </div>
         )}
       </div>
