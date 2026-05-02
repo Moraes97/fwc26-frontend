@@ -330,17 +330,19 @@ export default function Album() {
               style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: T.text2, fontSize: '11px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
               ✕
             </button>
-            {isRep && <>
+            {isRep && (
               <button onClick={e => { e.stopPropagation(); removeRep(code) }}
                 style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(232,23,93,0.2)', border: '1px solid rgba(232,23,93,0.5)', color: '#E8175D', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
                 -
               </button>
+            )}
+            {isRep && (
               <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '900', color: '#F5C518', minWidth: '16px', textAlign: 'center' }}>{getRep(code)}</span>
-              <button onClick={e => { e.stopPropagation(); addRep(code) }}
-                style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
-                +
-              </button>
-            </>}
+            )}
+            <button onClick={e => { e.stopPropagation(); addRep(code) }}
+              style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)', color: '#22C55E', fontSize: '14px', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1', padding: 0 }}>
+              +
+            </button>
           </div>
         )}
       </div>
