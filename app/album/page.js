@@ -183,12 +183,10 @@ export default function Album() {
     return items.length > 0 ? { pais: p, grupo: g, items } : null
   })).filter(Boolean)
 
-  const shinyList = GRUPOS.flatMap(g => g.p.flatMap(p =>
-    [19, 20].map(num => {
-      const code = p.c + '_' + String(num).padStart(2, '0')
-      return { code, num, pais: p, grupo: g, status: getStatus(code), qty: getQty(code) }
-    })
-  ))
+  const shinyList = GRUPOS.flatMap(g => g.p.flatMap(p => {
+    const code = p.c + '_01'
+    return [{ code, num: 1, pais: p, grupo: g, status: getStatus(code), qty: getQty(code) }]
+  }))
   const shinyHave = shinyList.filter(s => s.status !== 'MISSING').length
 
   const repeatedByPais = GRUPOS.flatMap(g => g.p.map(p => {
@@ -276,7 +274,7 @@ export default function Album() {
             </button>
             <button onClick={() => setActiveTab('brilhantes')}
               style={{ padding: '5px 12px', borderRadius: '99px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', letterSpacing: '.5px', background: activeTab === 'brilhantes' ? '#F5C518' : 'rgba(255,255,255,0.08)', color: activeTab === 'brilhantes' ? '#0a0a0a' : 'rgba(255,255,255,0.5)' }}>
-              {'BRILHANTES (' + shinyHave + '/96)'}
+              {'ESCUDOS (' + shinyHave + '/48)'}
             </button>
           </div>
           <div style={{ flex: 1, position: 'relative', maxWidth: '340px', margin: '0 auto', minWidth: '120px' }}>
@@ -402,7 +400,7 @@ export default function Album() {
             <div style={{ fontFamily: 'Barlow Condensed', fontSize: '28px', fontWeight: '900', marginBottom: '4px' }}>
               FIGURINHAS <span style={{ color: '#F5C518' }}>BRILHANTES</span>
             </div>
-            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{shinyHave + '/96 brilhantes coletadas (figurinhas 19 e 20 de cada selecao)'}</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{shinyHave + '/48 escudos coletados (figurinha 1 de cada selecao)'}</div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '10px' }}>
             {GRUPOS.map((g, gi) => (
@@ -411,7 +409,7 @@ export default function Album() {
                   <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: g.cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed', fontSize: '16px', fontWeight: '900', color: 'white', flexShrink: 0 }}>{g.n}</div>
                   <div style={{ fontFamily: 'Barlow Condensed', fontSize: '14px', fontWeight: '900' }}>GRUPO {g.n}</div>
                   <div style={{ marginLeft: 'auto', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
-                    {g.p.reduce((a, p) => a + [19,20].filter(n => getStatus(p.c+'_'+String(n).padStart(2,'0')) !== 'MISSING').length, 0) + '/' + (g.p.length * 2)}
+                    {g.p.filter(p => getStatus(p.c+'_01') !== 'MISSING').length + '/' + g.p.length}
                   </div>
                 </div>
                 <div style={{ padding: '10px', display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '6px' }}>
@@ -421,8 +419,8 @@ export default function Album() {
                         <img src={'https://flagcdn.com/w20/' + p.f + '.png'} style={{ width: '22px', height: '15px', borderRadius: '3px', objectFit: 'cover', flexShrink: 0 }} />
                         <span style={{ fontFamily: 'Barlow Condensed', fontSize: '12px', fontWeight: '700', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.n}</span>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                        {[19, 20].map(num => {
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px' }}>
+                        {[1].map(num => {
                           const code = p.c + '_' + String(num).padStart(2, '0')
                           const st = getStatus(code)
                           const qty = getQty(code)
